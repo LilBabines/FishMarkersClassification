@@ -8,6 +8,44 @@ import json
 import os
 import random
 from tqdm import tqdm
+def info_dataframe(df):
+
+    max=0
+    
+    min=np.inf
+
+    len_df=df.shape[0] 
+    print( f"nombre d'échantillon : {len_df}")
+    print(f'nombre unique sequence : {len(df["sequence"].value_counts())}')
+    for seq in df['sequence']:
+        l=len(seq)
+        if l>max:
+            max=l
+        if l<min:
+            min=l
+
+
+    print(f"taille max de séquence : {max}")
+    print(f"taille min de sequence : {min}")
+
+    
+    print(f'nombre de genus : {len(df["genus"].value_counts())}')
+
+
+    print(f'nombre de famille : {len(df["family"].value_counts())}')
+
+
+    print(f'nombre de order : {len(df["order"].value_counts())}')
+
+
+    
+    print(f'nombre de class : {len(df["class"].value_counts())}')
+
+
+    print(f'nombre de phylum : {len(df["phylum"].value_counts())}')
+
+
+    print(f'nombre d"espèce : {len(df["species"].value_counts())}')
 
 def pre_process(mitophish, ncbi):
     '''
@@ -18,21 +56,33 @@ def pre_process(mitophish, ncbi):
     # load Teleo from ncbi 12S
     teleo_12S= pd.read_csv(ncbi, sep='\t',header=None)
     teleo_12S.rename(columns={0:'ID_ncbi', 1:'ID', 2:'kingdom', 3:'phylum', 4:'class', 5:'order', 6:'family', 7:'genus', 8:'species', 9:'sequence'}, inplace=True)
+    # info_dataframe(teleo_12S)
+    # print('------------')
 
     # load Teleo from FishBase 12S
     teleo_fb = pd.read_csv(mitophish, sep='\t',header=None)
     teleo_fb.rename(columns={0:'ID_ncbi', 1:'ID', 2:'kingdom', 3:'phylum', 4:'class', 5:'order', 6:'family', 7:'genus', 8:'species', 9:'sequence'}, inplace=True)
-
+    # info_dataframe(teleo_fb)
+    # print('------------')
     # Filter the teleo_12S dataframe to keep only the classes present in the teleo_fb dataframe ie. fish classes
     fish_12S_teleo = teleo_12S[teleo_12S['class'].isin(teleo_fb['class'].unique())]
-
+    # info_dataframe(fish_12S_teleo)
     # Concatenate the two dataframes
     all_teleo = pd.concat([fish_12S_teleo, teleo_fb])
-
+    # print('------------')
+    # info_dataframe(all_teleo)
     # Fill nan ( add 170 sequences)
-
+    # print('------------')
     teleo_nan = all_teleo[all_teleo['class'].isna()]
+    # info_dataframe(teleo_nan)
     all_teleo = all_teleo.dropna(subset=['class'])
+
+    # teleo_nan.loc[teleo_nan['ID_ncbi'].isin(['AB626856.1.70.1026','AB626856']), ['kingdom', 'phylum', 'class', 'order', 'family', 'genus','species']] = ['Eukaryota', 'Chordata', 'Actinopteri', 'Cypriniformes', 'Leuciscidae', 'Pseudaspius','Pseudaspius_sachalinensis']
+
+    # teleo_nan.loc[teleo_nan['ID_ncbi'].isin(['AP011270.1.70.1026','AP011270']), ['kingdom', 'phylum', 'class', 'order', 'family', 'genus','species']] = ['Eukaryota', 'Chordata', 'Actinopteri', 'Cypriniformes', 'Leuciscidae', 'Pseudaspius','Pseudaspius_sachalinensis']
+
+
+    teleo_nan = teleo_nan[~teleo_nan['kingdom'].isna()]
 
     teleo_nan.loc[teleo_nan['order'].isin(['Coelacanthiformes', 'Ceratodontiformes']), 'class'] = 'Sarcopterygii'
 
@@ -43,8 +93,6 @@ def pre_process(mitophish, ncbi):
     teleo_nan.loc[teleo_nan['ID_ncbi'].isin(['AB626856.1.70.1026','AB626856']), ['kingdom', 'phylum', 'class', 'order', 'family', 'genus','species']] = ['Eukaryota', 'Chordata', 'Actinopteri', 'Cypriniformes', 'Leuciscidae', 'Pseudaspius','Pseudaspius_sachalinensis']
 
     teleo_nan.loc[teleo_nan['ID_ncbi'].isin(['AP011270.1.70.1026','AP011270']), ['kingdom', 'phylum', 'class', 'order', 'family', 'genus','species']] = ['Eukaryota', 'Chordata', 'Actinopteri', 'Cypriniformes', 'Leuciscidae', 'Pseudaspius','Pseudaspius_sachalinensis']
-
-    assert len(teleo_nan)==172, f"Wrong number of sequences : {len(teleo_nan)} should be 172"
 
     cleaned_teleo = pd.concat([teleo_nan, all_teleo])
 
@@ -114,7 +162,7 @@ def pre_process(mitophish, ncbi):
     teleo_class_A_C = teleo[(teleo['class'] == 'Actinopteri') | (teleo['class'] == 'Chondrichthyes')]
 
     teleo_class_A_C.to_csv("teleo_clean.tsv", sep='\t', index=False)
-
+    info_dataframe(teleo_class_A_C)
     return teleo_class_A_C 
 
 def fold_6_data(data_path, n_splits=6):
