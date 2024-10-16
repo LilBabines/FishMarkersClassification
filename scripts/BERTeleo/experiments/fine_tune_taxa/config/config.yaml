@@ -1,9 +1,9 @@
 hydra:
   run:
-    dir: experiments/fine_tune_taxa/outputs/6_fold_multitaxa_dnaber2
+    dir: experiments/fine_tune_taxa/outputs/6_fold_final_multitaxa_dnaber2
 
 data:
-  dataset_path: "experiments/fine_tune_taxa/data/"
+  dataset_path: "experiments/fine_tune_taxa/data/teleo_fold_augment"
 
 task:
   train : True  # False if just want to load model and evaluate, true to train before it
@@ -20,7 +20,7 @@ trainer:
     per_device_train_batch_size : 16
     per_device_eval_batch_size : 16
     weight_decay: 0.001
-    num_train_epochs : 35
+    num_train_epochs : 100
     eval_strategy : "steps"
     eval_steps : 1200
     logging_steps : 1200
@@ -45,7 +45,7 @@ model:
   bert_kwargs :
     hidden_size: 768
     max_position_embeddings: 514
-    ignore_mismatched_sizes: True
+    # ignore_mismatched_sizes: True
 
 loss :
   loss : "cross_entropy" # cross_entropy  ##### or BCEWithLogitsLoss not yet implemented
@@ -53,18 +53,18 @@ loss :
 
 metrics:
 
-  # macro_f1:
-  #   callable: 'MulticlassF1Score'
-  #   kwargs: 
-  #     average: 'macro'
+  macro_f1:
+    callable: 'MulticlassF1Score'
+    kwargs: 
+      average: 'macro'
   macro_accuracy:
     callable: 'MulticlassAccuracy'
     kwargs:
       average: 'macro'
-  # micro_f1:
-  #   callable: 'MulticlassF1Score'
-  #   kwargs: 
-  #     average: 'micro'
+  micro_f1:
+    callable: 'MulticlassF1Score'
+    kwargs: 
+      average: 'micro'
   micro_accuracy:
     callable: 'MulticlassAccuracy'
     kwargs:

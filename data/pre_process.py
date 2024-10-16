@@ -2,12 +2,19 @@
 
 import pandas as pd
 import numpy as np
+import sklearn
 from sklearn.model_selection import train_test_split, KFold
 import math
 import json
 import os
 import random
 from tqdm import tqdm
+
+seed = 111
+np.random.seed(seed)
+random.seed(seed)
+sklearn.utils.check_random_state(seed)
+
 def info_dataframe(df):
 
     max=0
@@ -237,7 +244,7 @@ def fold_6_data(data_path, n_splits=6):
                 # duplicate the fold assignment based on `duplicate` index
                 df.loc[family_data.index, f'fold_{f}'] = df.loc[family_data.index, f'fold_{dulicate[i]}'].copy()
     # save the data
-    df.to_csv("teleo_clean_fold.tsv", sep='\t', index=False)
+    df.to_csv("teleo_final_fold.tsv", sep='\t', index=False)
 
     return df
 
@@ -259,7 +266,7 @@ def get_repartition(data_path):
         test =df[df[f'fold_{i}'] == 'test']
         val_test = pd.concat([val,test])
 
-        print(f"Train genus ratio : {print(train['genus'].nunique() / (train['genus'].nunique() + val_test['genus'].nunique() ))}")
+        print(f"Train genus ratio : {train['genus'].nunique() / (train['genus'].nunique() + val_test['genus'].nunique() )}")
         print(f'Train samples ratio : {train.shape[0] /(val.shape[0] + train.shape[0] + test.shape[0])}')
         print(f"Val samples ratio : {val.shape[0] /(val.shape[0] + train.shape[0] + test.shape[0])}")
         print(f"Test samples ratio : {test.shape[0] /(val.shape[0] + train.shape[0] + test.shape[0])}")
@@ -275,12 +282,12 @@ def build_file(data_path):
         :param data_path: path to the pre-processed data with fold (teleo_clean_fold.tsv, separated by `tab`)
     '''
     df_with_folds = pd.read_csv(data_path, sep='\t')
-    df = df_with_folds.drop_duplicates(subset=['sequence','genus'], keep='first')
+    df = df_with_folds #.drop_duplicates(subset=['sequence','genus'], keep='first')
 
     os.makedirs("data/teleo_clean", exist_ok=True)
     for i in range(6):
 
-        os.makedirs(f"/data/teleo_clean/fold_{i+1}", exist_ok=True)
+        os.makedirs(f"data/teleo_clean/fold_{i+1}", exist_ok=True)
         
         train = df_with_folds[df_with_folds[f'fold_{i}'] == 'train']
         val = df_with_folds[df_with_folds[f'fold_{i}'] == 'val']
@@ -291,13 +298,13 @@ def build_file(data_path):
         json.dump(json_data, open(rf"data/teleo_clean/fold_{i+1}/test_genus.json", 'w'))
 
         # We want to classify the sequences by family, so we need to remove duplicates at the family level
-        train = train.drop_duplicates(subset=['sequence','family'], keep='first')
-        val = val.drop_duplicates(subset=['sequence','family'], keep='first')
-        test = test.drop_duplicates(subset=['sequence','family'], keep='first')
-
-        val[['sequence', 'order' , 'family', 'genus','species']].to_csv(f"data/teleo_clean/fold_{i+1}/val.csv", sep=',', index=False, header=True)
-        train[['sequence', 'order' , 'family', 'genus', 'species']].to_csv(rf"data/teleo_clean/fold_{i+1}/train.csv", sep=',', index=False, header=True)
-        test[['sequence', 'order' , 'family', 'genus', 'species']].to_csv(rf"data/teleo_clean/fold_{i+1}/test.csv", sep=',', index=False, header=True)
+        train = train#.drop_duplicates(subset=['sequence','family'], keep='first')
+        val = val#.drop_duplicates(subset=['sequence','family'], keep='first')
+        test = test#.drop_duplicates(subset=['sequence','family'], keep='first')
+        columns = ['taxid_ncbi','kingdom','phylum','class','order','family','genus','species','sequence']
+        val[columns].to_csv(f"data/teleo_clean/fold_{i+1}/val.csv", sep=',', index=False, header=True)
+        train[columns].to_csv(rf"data/teleo_clean/fold_{i+1}/train.csv", sep=',', index=False, header=True)
+        test[columns].to_csv(rf"data/teleo_clean/fold_{i+1}/test.csv", sep=',', index=False, header=True)
 
 def mutate_dna_sequence(sequence, mutation_probability):
     mutated_sequence = ""
@@ -325,9 +332,9 @@ def split_and_mutate_sequence(sequence):
     part_3 = sequence[length_1+length_2:]
     
     # Apply mutate_dna_sequence to each part with respective probabilities
-    mutated_part_1 = mutate_dna_sequence(part_1, 0.024)
-    mutated_part_2 = mutate_dna_sequence(part_2, 0.24)
-    mutated_part_3 = mutate_dna_sequence(part_3, 0.008)
+    mutated_part_1 = mutate_dna_sequence(part_1, 0.012)
+    mutated_part_2 = mutate_dna_sequence(part_2, 0.12)
+    mutated_part_3 = mutate_dna_sequence(part_3, 0.004)
     
     # Concatenate the mutated parts into a new sequence
     mutated_sequence = mutated_part_1 + mutated_part_2 + mutated_part_3
@@ -371,4 +378,4 @@ def mutate_data_fold(data_path = "data/teleo_clean"):
     for fold in range(1, 7):
         df = pd.read_csv(data_path +f"/fold_{fold}/train.csv")
         df = mutate(df)
-        df.to_csv(data_path +f"/fold_{fold}/train_med_augment.csv", index=False)
+        df.to_csv(data_path +f"/fold_{fold}/train_low_augment.csv", index=False)

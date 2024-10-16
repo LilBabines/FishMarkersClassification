@@ -4,7 +4,7 @@ from torchmetrics.classification import MulticlassF1Score, MulticlassAccuracy
 import torch
 
 available_metrics = {
-        # 'MulticlassF1Score': MulticlassF1Score,
+        'MulticlassF1Score': MulticlassF1Score,
         'MulticlassAccuracy': MulticlassAccuracy
     }
     

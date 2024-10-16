@@ -97,6 +97,11 @@ def main(cfg: DictConfig):
                 dataframe["labels_order"] = result.label_ids[:,0]
                 dataframe["labels_family"] = result.label_ids[:,1]
 
+                dataframe["labels_order_name"] = dataframe["labels_order"].map(id2label_order)
+                dataframe["labels_family_name"] = dataframe["labels_family"].map(id2label_family)
+                dataframe["preds_order_name"] = dataframe["preds_order"].map(id2label_order)
+                dataframe["preds_family_name"] = dataframe["preds_family"].map(id2label_family)
+
                 import pickle
                 pickle.dump({'preds':result.predictions,'labels':result.label_ids}, open(os.path.join(log_dir,'checkpoints',fold,"predictions.pkl"), 'wb'))
                 dataframe.to_csv(os.path.join(log_dir,'checkpoints',fold,"predictions.csv"), index=False)
