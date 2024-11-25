@@ -24,6 +24,8 @@ Refer to CRABS instalation [github](https://github.com/gjeunen/reference_databas
 
 ## Assign Taxonomy :
 
+* First of all, download taxonomy file : `crabs db_download --source taxonomy` 
+  
 * MitoFish : `crabs assign_tax --input data/mitofish/teleo_fb_3/output_pga_3.fasta --output data/mitofish/teleo_fb_3/output_pga_3.tsv --acc2tax nucl_gb.accession2taxid --taxid nodes.dmp --name names.dmp --missing "data/mitofish/teleo_fb_3/teleo_missing_taxa_pga_3.tsv"`
 
 * MIDORI2 : `crabs assign_tax --input "data/12S/teleo_12S_3/output_pga_3.fasta" --output /data/12S/teleo_12S_3/output_pga_3.tsv --acc2tax nucl_gb.accession2taxid --taxid nodes.dmp --name names.dmp --missing "/data/12S/teleo_12S_3/teleo_missing_taxa.tsv"`
