@@ -32,6 +32,7 @@ Here is an overview of the main Python librairies used in this project.
 - Auguste Verdier - auguste.verdier@umontpellier.fr
 
 **Contributor :** 
+- Morgane Bruno - morgane.bruno@cefe.cnrs.fr
 - Simon Bettinger - sbettinger33@gmail.com
 - David Mouillot - david.mouillot@umontpellier.fr
 
