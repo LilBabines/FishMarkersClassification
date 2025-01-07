@@ -181,3 +181,5 @@ RESULTS/BERTAX
 *log/
 *.fasta
 *.ecotag
+
+*copy.ipynb*
