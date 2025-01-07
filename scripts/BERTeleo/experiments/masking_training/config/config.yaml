@@ -1,10 +1,9 @@
 hydra:
   run:
-    dir: experiments/masking_training/outputs/6_fold_masking_pre_train
-
+    dir: experiments/masking_training/outputs/masking_berry
 data:
-  kfold : True
-  dataset_path: "experiments/masking_training/data/teleo/6_fold_masking_pre_train/"
+  kfold : False
+  dataset_path: "experiments/masking_training/data/berry/"
 
 task:
   train : True  # False if just want to load model and evaluate, true to train before it
@@ -47,7 +46,7 @@ trainer:
 
 model:
   model_name: "zhihan1996/DNABERT-2-117M"
-  tokenizer_name: 4 #"zhihan1996/DNABERT-2-117M"  # can train "bpe" or an int for k-mer
+  tokenizer_name: "zhihan1996/DNABERT-2-117M"  # can train "bpe" or an int for k-mer
   local : False  # set to True to load the model with model_name from local path
   mlm_probability : 0.20
   bert_kwargs :

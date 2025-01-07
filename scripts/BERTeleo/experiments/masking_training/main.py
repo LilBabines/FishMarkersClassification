@@ -38,9 +38,6 @@ def main(cfg: DictConfig):
             train_dataset, val_dataset= encode_self_supervised_dataset(tokenizer,dir_path=os.path.join(cfg.data.dataset_path,fold))
             model = bert_layers.BertForMaskedLM.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
             model.resize_token_embeddings(len(tokenizer))
-            
-    
-    
     
             data_collator = DataCollatorForLanguageModeling(
                 tokenizer=tokenizer,
@@ -91,7 +88,37 @@ def main(cfg: DictConfig):
             if cfg.task.train :
                 trainer.evaluate()
                 trainer.train()
+    else:
+        tokenizer = load_tokenizer(cfg.model.tokenizer_name)
 
+        train_dataset, val_dataset= encode_self_supervised_dataset(tokenizer,dir_path=cfg.data.dataset_path)
+        model = bert_layers.BertForMaskedLM.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
+        model.resize_token_embeddings(len(tokenizer))
+        
+
+    
+    
+        data_collator = DataCollatorForLanguageModeling(
+            tokenizer=tokenizer,
+            mlm_probability= 0.20
+            )
+
+        args = TrainingArguments(output_dir=os.path.join(log_dir,'checkpoints'),**cfg.trainer.kwargs,save_safetensors=False, logging_dir = os.path.join(log_dir,'logs'))
+        trainer = Trainer(
+            model=model,
+            args=args,
+            data_collator=data_collator,
+            train_dataset=train_dataset,
+            eval_dataset=val_dataset,
+            tokenizer=tokenizer,
+            #callbacks=[EarlyStoppingCallback(early_stopping_patience=20)]
+        )
+        if cfg.task.train :
+            trainer.evaluate()
+            trainer.train()
+        
+
+        
 if __name__ == "__main__":
     
     main()
