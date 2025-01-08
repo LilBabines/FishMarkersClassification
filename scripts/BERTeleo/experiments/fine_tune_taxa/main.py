@@ -58,7 +58,7 @@ def main(cfg: DictConfig):
             raise ValueError("cfg.task.task has to be either 'multiTaxa' or 'singleTaxa'")
         
         if cfg.model.local:
-            best_model = get_best(os.path.join(cfg.model.local_path,fold))
+            best_model = get_best(os.path.join(cfg.model.local_path))
             print("best_model: ", best_model)
             
             masked_lm_model = bert_layers.BertForMaskedLM.from_pretrained(best_model)
