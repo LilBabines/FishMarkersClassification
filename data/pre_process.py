@@ -118,6 +118,9 @@ def clean_taxo_consistency(df, verif= False):
     df.loc[(df['genus'] == 'Achoerodus'), 'family'] = 'Labridae'
     df.loc[(df['genus'] == 'Cyathochromis'), 'family'] = 'Cichlidae'
     df.loc[(df['genus'] == 'Gastropsetta'), 'family'] = 'Paralichthyidae'
+    df.loc[(df['genus'] == 'Ascelichthys'), 'family'] = 'Cottidae'
+    df.loc[(df['genus'] == 'Erotelis'), 'family'] = 'Eleotridae'
+    df.loc[(df['genus'] == 'Muraenolepis'), 'family'] = 'Muraenolepididae'
 
     df.loc[(df['genus'] == 'Tachysurus'), 'order'] = 'Cypriniformes'
     df.loc[(df['genus'] == 'Algansea'), 'order'] = 'Cypriniformes'
@@ -176,7 +179,6 @@ def clean_taxo_consistency(df, verif= False):
                 # print(values_count)
                 max_val_count = values_count.index[0]
 
-                
                 if values_count.iloc[0] > 1.5 * values_count.iloc[1]:
                     df.loc[df[rank] == rank_name, up_rank] = max_val_count
                 else:
@@ -196,12 +198,9 @@ def verif_taxo_consistency(df):
         for rank_name in tqdm(df[rank].unique()):
 
             sub_data = df[df[rank] == rank_name]
-
-            
             super_rank = ranks[i]
-            if sub_data[super_rank].nunique() != 1:
+            assert sub_data[super_rank].nunique() == 1, f"rank {super_rank} is not unique for {rank,rank_name}, {sub_data[super_rank].value_counts()} "
 
-                print("ERROR : ",f"rank {super_rank} is not unique for {rank,rank_name}, {sub_data[super_rank].value_counts()} ")
 
 def clean_taxid_incompability(df):
 
@@ -451,13 +450,13 @@ def pre_process_mifish(path_mitofish, path_genbank):
     # Keep only Actinopteri and Chondrichthyes
     mifish = mifish[(mifish['class'] == 'Actinopteri') | (mifish['class'] == 'Chondrichthyes')]
 
-    mifish = clean_taxo_consistency(mifish)
+    mifish = clean_taxo_consistency(mifish, verif=True)
 
     verif_taxid_incompability(mifish)
 
     mifish = final_process(mifish)
 
-    mifish.to_csv("data_clean/mifish_clean_tsv", sep='\t', index=False)
+    mifish.to_csv("data_clean/mifish_clean.tsv", sep='\t', index=False)
 
     return  mifish
 
