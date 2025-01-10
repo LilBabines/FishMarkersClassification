@@ -111,7 +111,7 @@ def main(cfg: DictConfig):
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
             tokenizer=tokenizer,
-            #callbacks=[EarlyStoppingCallback(early_stopping_patience=20)]
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=cfg.trainer.early_stopping_patience)]
         )
         if cfg.task.train :
             trainer.evaluate()
