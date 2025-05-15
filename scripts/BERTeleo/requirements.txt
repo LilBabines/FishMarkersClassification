@@ -8,3 +8,5 @@ scikit-learn
 torchmetrics
 matplotlib
 einops
+tensorboardX
+tensorboard

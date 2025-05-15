@@ -1,0 +1,8 @@
+torch
+transformers[torch]
+torchmetrics
+hydra-core
+datasets
+scikit-learn
+matplotlib
+einops

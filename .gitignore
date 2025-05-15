@@ -181,3 +181,7 @@ RESULTS/BERTAX
 *log/
 *.fasta
 *.ecotag
+
+taxdump/
+fish.obidms/
+checkpoint-*/

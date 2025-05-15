@@ -10,26 +10,29 @@ from data.dataset import load_data, encode_multiTaxa_dataset, encode_singleTaxa_
 from models.model import MultiTaxaClassification, load_bert_model, get_best
 from utils.trainer import define_trainer
 from utils.visualize import plot_save_loss
-
-sys.path.append(os.path.join(os.getcwd(), 'resources'))
-from dnabert2  import bert_layers
+from models.dnabert2  import bert_layers
 
 from transformers import TrainingArguments, AutoModel, EarlyStoppingCallback
 import torch
 
 
+#set seeds
 
-# TODO: Add diferent loss, BCEWithLogitsLoss for weight imbalance classes
-# TODO: -----------------, HierarchicalLoss for pénaliser les famille  qui ne sont pas dans l'ordre et que l'ordre est bien prédit
-# TODO: Add bertax model............. je vais encore m'amuser moi
+def set_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    os.environ['PYTHONHASHSEED'] = str(seed)
+set_seed(42)
+
 
 @hydra.main(version_base="1.3",config_path="config", config_name="config")
 def main(cfg: DictConfig):
     
+
     log_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
     print("log_dir: ", log_dir)
-    
-
     tokenizer = load_tokenizer(cfg.model.tokenizer_name)
     print("len tokenizer: ", tokenizer.vocab_size)
 
@@ -87,7 +90,10 @@ def main(cfg: DictConfig):
             
         result = trainer.predict(test_dataset)
         print("Metrics on test set: ", result.metrics)
+
         if cfg.task.save_preds :
+
+            import pickle
 
             if cfg.task.task == "multiTaxa":
                 dataframe = pd.DataFrame( columns = ["preds_order","preds_family", "labels_order", "labels_family"]) 
@@ -102,7 +108,7 @@ def main(cfg: DictConfig):
                 dataframe["preds_order_name"] = dataframe["preds_order"].map(id2label_order)
                 dataframe["preds_family_name"] = dataframe["preds_family"].map(id2label_family)
 
-                import pickle
+                
                 pickle.dump({'preds':result.predictions,'labels':result.label_ids}, open(os.path.join(log_dir,'checkpoints',fold,"predictions.pkl"), 'wb'))
                 dataframe.to_csv(os.path.join(log_dir,'checkpoints',fold,"predictions.csv"), index=False)
 
@@ -126,7 +132,5 @@ def main(cfg: DictConfig):
 if __name__ == "__main__":
     
     main()
-    # pass
-    # d= ['macro_accuracy_order', 'micro_accuracy_order', 'macro_accuracy_family', 'micro_accuracy_family']
-    # plot_save_loss(r"C:\Users\Auguste Verdier\Desktop\TeleoClassification\outputs\TeleoSplitGenera_300_medium\DNABERT-2-117\multiTaxa", metrics = d)
+
     

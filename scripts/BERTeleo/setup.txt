@@ -1,10 +1,10 @@
-1 - create python env
+1 - install python packages
 
-with conda : conda create -n teleo_classif python
 
-2- install package
+pip install -r requirements
 
-conda activate teleo_classif
+------ or -----
+
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip install transformers[torch]
 pip install hydra-core
@@ -13,3 +13,12 @@ pip install scikit-learn
 pip install torchmetrics
 pip install matplotlib
 pip install einops
+
+
+2 - depends on your hardware you should uninstall triton, regarding to github triton issues : https://github.com/MAGICS-LAB/DNABERT_2/issues?q=is%3Aissue%20triton
+
+
+3 - If using a recent python version, you will need standard-imghdr package to use Tensorboard:
+
+pip install standard-imghdr, it might be a better way to do it
+
