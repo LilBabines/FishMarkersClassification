@@ -22,7 +22,7 @@ color info 94m
 
 ## Read config file
 data_nfold=6
-input_dir="data/teleo/"
+input_dir="data/teleov2_no_cefe/folds/"
 
 #_main
 ## Download taxdump files and import in OBITools3 format
@@ -39,13 +39,13 @@ for fold in $(eval echo {1..$data_nfold}); do
   printf $info "::Info:: Start  taxonomic classification for fold ${fold} ...\n"
   
   ## Input dataset
-  train="${input_dir}fold_${fold}/train_pure.csv"
+  train="${input_dir}fold_${fold}/train.csv"
   test="${input_dir}fold_${fold}/test.csv"
 
   ## Convert datasets into fasta format
   intermediate="intermediate/teleo/fold_${fold}"
   mkdir -p $intermediate
-  train_fa="${intermediate}/train_pure.fasta"
+  train_fa="${intermediate}/train.fasta"
   test_fa="${intermediate}/test.fasta"
   if [ ! -f $train_fa ]; then
     printf $info "::Info:: Convert datasets into OBITools extended fasta \n" 

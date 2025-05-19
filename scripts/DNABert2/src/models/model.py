@@ -84,13 +84,13 @@ class HierachicalLoss(nn.Module):
 
 
 class MultiTaxaClassification(nn.Module):
-    def __init__(self, num_labels_order = 72, num_labels_family = 303, vocab_size = None,**bert_kwargs ):
+    def __init__(self, num_labels_order = 72, num_labels_family = 303, vocab_size = None, model_name = "zhihan1996/DNABERT-2-117M",**bert_kwargs ):
         super(MultiTaxaClassification,self).__init__()
         
         self.num_labels = (num_labels_order, num_labels_family)
         self.problem_type = "multi_label_classification"
-        config = BertConfig.from_pretrained("zhihan1996/DNABERT-2-117M",vocab_size= vocab_size,**bert_kwargs )
-        self.bert = AutoModel.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True,config=config, ignore_mismatched_sizes=True)
+        config = BertConfig.from_pretrained(model_name,vocab_size= vocab_size,**bert_kwargs )
+        self.bert = AutoModel.from_pretrained(model_name, trust_remote_code=True,config=config, ignore_mismatched_sizes=True)
         self.bert.resize_token_embeddings(vocab_size)
         
         hidden_size = self.bert.config.hidden_size

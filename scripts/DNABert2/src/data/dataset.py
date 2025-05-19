@@ -31,7 +31,7 @@ def load_data(path="Data/TeleoSplitGenera_300_medium/"):
         val (pd.DataFrame): The validation dataset
 
     '''
-    train = pd.read_csv(os.path.join(path , "train.csv"))
+    train = pd.read_csv(os.path.join(path , "train_low_augment.csv"))
     val = pd.read_csv(os.path.join(path ,  "val.csv"))
     if 'test.csv' in os.listdir(path):
         test = pd.read_csv(os.path.join(path ,  "test.csv"))

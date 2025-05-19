@@ -185,3 +185,5 @@ RESULTS/BERTAX
 taxdump/
 fish.obidms/
 checkpoint-*/
+tax_out/
+ncbi-taxdump/
