@@ -59,7 +59,10 @@ class AugmentedDataset(Dataset):
         item['labels'] = label
         return item
 def encode_self_supervised_dataset(tokenizer, dir_path):
-    train, _, val = load_data(dir_path)
+    train, _, _ = load_data(dir_path)
+    val = train.sample(frac=0.05, random_state=42)
+    train = train.drop(val.index)
+
     # Tokenize the sequences
     train_encodings = tokenizer(train['sequence'].tolist(), truncation=True, max_length=512)
     val_encodings = tokenizer(val['sequence'].tolist(), truncation=True, max_length=512)

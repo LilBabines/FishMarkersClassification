@@ -7,8 +7,8 @@ color() {
 }
 color info 94m 
 
-input_dir="teleov2_no_cefe/folds/"
-output_dir="result/teleov2_no_cefe/folds/"
+input_dir="mifish/folds/"
+output_dir="result/mifish/folds/"
 
 if [ ! -f ncbi-taxdump/names.dmp ]; then
 
@@ -22,6 +22,8 @@ fi
 for fold in $(eval echo {1..6}); do
 
     printf $info "::Info:: Start  taxonomic classification for fold ${fold} ...\n"
+
+    start=$(date +%s)
 
     ## Input dataset
     db="${input_dir}fold_${fold}/train.fasta"
@@ -49,9 +51,9 @@ for fold in $(eval echo {1..6}); do
     out="${output_dir}fold_${fold}/tax_out/tax_out"
 
     rm -rf $out
-
+    
     mmseqs easy-taxonomy $query $target_db $out $tmp --search-type 3 -e 1e-5 --lca-mode 4 #--min-seq-id 0.1 -e 1e-5  --search-type 3 # --cov-mode 0  --orf-filter 0 -c 1
-
+    
     rm -rf $tmp
     # out_tsv="${input_dir}fold_${fold}/tax_out/tax_out.tsv"
     # in_tsv="${input_dir}fold_${fold}/tax_out/tax_out_lca.tsv"
@@ -59,6 +61,11 @@ for fold in $(eval echo {1..6}); do
 
     rm -rf ${input_dir}fold_${fold}/targetDB
     rm -rf ${input_dir}fold_${fold}/queryDB
+
+    end=$(date +%s)
+    runtime=$((end - start))
+
+    echo "Temps d'exécution : $runtime secondes"
 done
 
 

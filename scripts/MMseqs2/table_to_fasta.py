@@ -56,10 +56,10 @@ def test_csv_to_fasta(csv,fasta):
     return csv
 
 for fold in folds:
-    train = pd.read_csv(f'teleov2_no_cefe/folds/{fold}/train.csv')
+    train = pd.read_csv(f'Ac16/folds/{fold}/train.csv')
     train['tax_id'] = train['family'].apply(get_ncbi_id_from_taxon_name)
-    csv = csv_to_fasta(train, f'teleov2_no_cefe/folds/{fold}/train.fasta')
+    csv = csv_to_fasta(train, f'Ac16/folds/{fold}/train.fasta')
     csv_uniq_tax = csv[['unique_header', 'tax_id']]
-    csv_uniq_tax.to_csv(f'teleov2_no_cefe/folds/{fold}/train_tax.tsv',sep=' ', index=False)
-    test = pd.read_csv(f'teleov2_no_cefe/folds/{fold}/test.csv')
-    test_csv_to_fasta(test, f'teleov2_no_cefe/folds/{fold}/test.fasta')
+    csv_uniq_tax.to_csv(f'Ac16/folds/{fold}/train_tax.tsv',sep=' ', index=False)
+    test = pd.read_csv(f'Ac16/folds/{fold}/test.csv')
+    test_csv_to_fasta(test, f'Ac16/folds/{fold}/test.fasta')

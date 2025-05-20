@@ -353,11 +353,11 @@ class BertEncoder(nn.Module):
         # the input the model receives. But it generally helps to initialize it
         # to a reasonably large size to help pre-allocate CUDA memory.
         # The default `alibi_starting_size` is 512.
-        self._current_alibi_size = int(config.alibi_starting_size)
+        self._current_alibi_size = 512 #int(config.alibi_starting_size)
         self.alibi = torch.zeros(
             (1, self.num_attention_heads, self._current_alibi_size,
              self._current_alibi_size))
-        self.rebuild_alibi_tensor(size=config.alibi_starting_size)
+        self.rebuild_alibi_tensor(size=self._current_alibi_size)
 
     def rebuild_alibi_tensor(self,
                              size: int,

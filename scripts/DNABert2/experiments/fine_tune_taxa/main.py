@@ -12,8 +12,10 @@ from utils.trainer import define_trainer
 from utils.visualize import plot_save_loss
 from models.dnabert2  import bert_layers
 
-from transformers import TrainingArguments, AutoModel, EarlyStoppingCallback
+from transformers import TrainingArguments, AutoModel, EarlyStoppingCallback, BertConfig
 import torch
+
+import time
 
 
 #set seeds
@@ -30,13 +32,14 @@ set_seed(42)
 @hydra.main(version_base="1.3",config_path="config", config_name="config")
 def main(cfg: DictConfig):
     
+    
 
     log_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
     print("log_dir: ", log_dir)
     tokenizer = load_tokenizer(cfg.model.tokenizer_name)
 
     for fold in os.listdir(cfg.data.dataset_path):
-
+        start_time = time.time()
         print('-----------------')
         print(f"Fold: {fold}")
         if os.path.exists(os.path.join(log_dir,'checkpoints',fold)):
@@ -59,24 +62,38 @@ def main(cfg: DictConfig):
         else:
             raise ValueError("cfg.task.task has to be either 'multiTaxa' or 'singleTaxa'")
         
-        if cfg.model.local:
-            best_model = get_best(os.path.join(cfg.model.local_path))
-            print("best_model: ", best_model)
-            
-            masked_lm_model = bert_layers.BertForMaskedLM.from_pretrained(best_model)
-            
-            
-            model.bert.load_state_dict(masked_lm_model.bert.state_dict(),strict=False)
+        if cfg.model.local :
+
+            if cfg.task.train :
+                #from MLM Task
+                print("Loading MLM model")
+                best_model = get_best(os.path.join(cfg.model.local_path))
+                print("best_model: ", best_model)
+                
+
+                masked_lm_model = bert_layers.BertForMaskedLM.from_pretrained(best_model)
+                
+                
+                model.bert.load_state_dict(masked_lm_model.bert.state_dict(),strict=False)
+            else :
+                print("Loading Fine-tuned model")
+
+                config = BertConfig.from_pretrained(get_best(cfg.task.checkpoint_path+"/"+fold))
+                model.load_state_dict(torch.load(get_best(cfg.task.checkpoint_path+"/"+fold)+"/pytorch_model.bin"))
+                # model = MultiTaxaClassification.from_pretrained(get_best(cfg.task.checkpoint_path+"/"+fold))
+
         
 
         args = TrainingArguments(os.path.join(log_dir,'checkpoints',fold),
                                  **cfg.trainer.kwargs,
                                  save_safetensors=False, 
                                  logging_dir = os.path.join(log_dir,'logs',fold))
+        
         trainer, metrics_order, metrics_family = define_trainer(model, tokenizer, train_dataset, val_dataset, num_classes,cfg.metrics,args,callbacks=[EarlyStoppingCallback(early_stopping_patience=cfg.trainer.early_stopping_patience)]) #
 
-        print("Training")
+        
         if cfg.task.train :
+            print("Training")
             try:
 
                 trainer.train()
@@ -86,6 +103,7 @@ def main(cfg: DictConfig):
                 
             plot_save_loss(os.path.join(log_dir,'checkpoints',fold), metrics = metrics_order +metrics_family)
         
+        print("Testing")
             
         result = trainer.predict(test_dataset)
         print("Metrics on test set: ", result.metrics)
@@ -95,6 +113,7 @@ def main(cfg: DictConfig):
             import pickle
 
             if cfg.task.task == "multiTaxa":
+
                 dataframe = pd.DataFrame( columns = ["preds_order","preds_family", "labels_order", "labels_family"]) 
                 dataframe["preds_order"] = result.predictions[0].argmax(axis=1).squeeze()
                 dataframe["preds_family"] = result.predictions[1].argmax(axis=1).squeeze()
@@ -126,6 +145,8 @@ def main(cfg: DictConfig):
                 
                 pickle.dump({'preds':result.predictions,'labels':result.label_ids}, open(os.path.join(log_dir,'checkpoints',fold,"predictions.pkl"), 'wb'))
                 dataframe.to_csv(os.path.join(log_dir,'checkpoints',fold,"predictions.csv"), index=False)
+
+        print("Time taken: ", time.time() - start_time)
 
 
 if __name__ == "__main__":

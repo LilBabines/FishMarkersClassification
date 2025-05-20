@@ -13,17 +13,21 @@ from transformers import (
     TrainingArguments,
     EarlyStoppingCallback
 )
-
-sys.path.append(os.path.join(os.getcwd(), 'resources'))
+from models.dnabert2  import bert_layers
+import torch
 from data.dataset import encode_self_supervised_dataset
-from dnabert2 import bert_layers
 
 
-# TODO: Add diferent loss, BCEWithLogitsLoss for weight imbalance classes
-# TODO: -----------------, HierarchicalLoss for pénaliser les famille  qui ne sont pas dans l'ordre et que l'ordre est bien prédit
-# TODO: Add bertax model............. je vais encore m'amuser moi
+def set_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    os.environ['PYTHONHASHSEED'] = str(seed)
+set_seed(42)
 
-@hydra.main(version_base="1.3",config_path="config", config_name="config")
+
+@hydra.main(version_base="1.3",config_path="config", config_name="config_berry")
 def main(cfg: DictConfig):
     
     log_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
