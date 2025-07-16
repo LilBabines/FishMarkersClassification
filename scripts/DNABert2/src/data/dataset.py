@@ -29,7 +29,6 @@ def load_data(path="Data/TeleoSplitGenera_300_medium/"):
         train (pd.DataFrame): The training dataset
         test (pd.DataFrame): The testing dataset
         val (pd.DataFrame): The validation dataset
-
     '''
     train = pd.read_csv(os.path.join(path , "train_low_augment.csv"))
     val = pd.read_csv(os.path.join(path ,  "val.csv"))
@@ -58,10 +57,12 @@ class AugmentedDataset(Dataset):
         item = {key: val.squeeze() for key, val in encodings.items()}
         item['labels'] = label
         return item
+    
 def encode_self_supervised_dataset(tokenizer, dir_path):
-    train, _, _ = load_data(dir_path)
-    val = train.sample(frac=0.05, random_state=42)
-    train = train.drop(val.index)
+    # train, val, test = load_data(dir_path)
+    data = load_data(dir_path)
+    val = data.sample(frac=0.05, random_state=42)
+    train = data.drop(val.index)
 
     # Tokenize the sequences
     train_encodings = tokenizer(train['sequence'].tolist(), truncation=True, max_length=512)

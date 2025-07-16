@@ -1,13 +1,13 @@
 hydra:
   run:
-    dir: experiments/fine_tune_taxa/outputs/ac16_from_mlm
+    dir: experiments/fine_tune_taxa/outputs/berry_from_mlm
 
 data:
-  dataset_path: "experiments/fine_tune_taxa/data/Ac16/folds"
+  dataset_path: "experiments/fine_tune_taxa/data/berry/folds"
 
 task:
   train : True  # False if just want to load model and evaluate, true to train before it
-  checkpoint_path : experiments/masking_training/outputs/masking_Ac16/checkpoints
+  checkpoint_path : #experiments/masking_training/outputs/masking_Ac16/checkpoints
   save_preds : True
   task: "multiTaxa" # multiTaxa or singleTaxa
   
@@ -44,7 +44,7 @@ model:
   model_name: "zhihan1996/DNABERT-2-117M"
   tokenizer_name: "zhihan1996/DNABERT-2-117M"  # can train "bpe" or an int for k-mer
   local : True  # set to True to load the model with model_name from local path
-  local_path :  experiments/masking_training/outputs/masking_Ac16/checkpoints
+  local_path :  experiments/masking_training/outputs/masking_berry/checkpoints
   bert_kwargs :
     hidden_size: 768
     max_position_embeddings: 512

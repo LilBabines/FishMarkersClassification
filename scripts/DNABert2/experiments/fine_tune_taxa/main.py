@@ -11,6 +11,7 @@ from models.model import MultiTaxaClassification, load_bert_model, get_best
 from utils.trainer import define_trainer
 from utils.visualize import plot_save_loss
 from models.dnabert2  import bert_layers
+import json
 
 from transformers import TrainingArguments, AutoModel, EarlyStoppingCallback, BertConfig
 import torch
@@ -51,6 +52,9 @@ def main(cfg: DictConfig):
             
             train_dataset, val_dataset, test_dataset, id2label_order, label2id_order, id2label_family, label2id_family = encode_multiTaxa_dataset(tokenizer, os.path.join(cfg.data.dataset_path,fold))
             num_classes = (len(id2label_order) , len(id2label_family))
+
+            json.dump(id2label_family, open(os.path.join(log_dir,'checkpoints',fold,"id2label_family.json"), 'w'))
+            json.dump(label2id_family, open(os.path.join(log_dir,'checkpoints',fold,"label2id_family.json"), 'w'))
 
             model = MultiTaxaClassification( len(id2label_order), len(id2label_family),vocab_size = tokenizer.vocab_size,model_name=cfg.model.model_name ,**cfg.model.bert_kwargs)  
 

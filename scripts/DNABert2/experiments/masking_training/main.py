@@ -104,7 +104,7 @@ def main(cfg: DictConfig):
     
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=tokenizer,
-            mlm_probability= 0.20
+            mlm_probability= 0.2
             )
 
         args = TrainingArguments(output_dir=os.path.join(log_dir,'checkpoints'),**cfg.trainer.kwargs,save_safetensors=False, logging_dir = os.path.join(log_dir,'logs'))

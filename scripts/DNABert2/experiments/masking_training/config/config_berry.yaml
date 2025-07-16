@@ -1,9 +1,9 @@
 hydra:
   run:
-    dir: experiments/masking_training/outputs/masking_Ac16
+    dir: experiments/masking_training/outputs/masking_berry
 data:
   kfold : False
-  dataset_path: "experiments/masking_training/data/Ac16_MLM/"
+  dataset_path: "experiments/masking_training/data/data_clean/"
 
 task:
   train : True  # False if just want to load model and evaluate, true to train before it
