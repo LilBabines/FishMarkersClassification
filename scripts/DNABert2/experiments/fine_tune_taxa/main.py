@@ -53,9 +53,6 @@ def main(cfg: DictConfig):
             train_dataset, val_dataset, test_dataset, id2label_order, label2id_order, id2label_family, label2id_family = encode_multiTaxa_dataset(tokenizer, os.path.join(cfg.data.dataset_path,fold))
             num_classes = (len(id2label_order) , len(id2label_family))
 
-            json.dump(id2label_family, open(os.path.join(log_dir,'checkpoints',fold,"id2label_family.json"), 'w'))
-            json.dump(label2id_family, open(os.path.join(log_dir,'checkpoints',fold,"label2id_family.json"), 'w'))
-
             model = MultiTaxaClassification( len(id2label_order), len(id2label_family),vocab_size = tokenizer.vocab_size,model_name=cfg.model.model_name ,**cfg.model.bert_kwargs)  
 
         elif cfg.task.task == "singleTaxa":
@@ -118,6 +115,9 @@ def main(cfg: DictConfig):
 
             if cfg.task.task == "multiTaxa":
 
+                json.dump(id2label_family, open(os.path.join(log_dir,'checkpoints',fold,"id2label_family.json"), 'w'))
+                json.dump(label2id_family, open(os.path.join(log_dir,'checkpoints',fold,"label2id_family.json"), 'w'))
+
                 dataframe = pd.DataFrame( columns = ["preds_order","preds_family", "labels_order", "labels_family"]) 
                 dataframe["preds_order"] = result.predictions[0].argmax(axis=1).squeeze()
                 dataframe["preds_family"] = result.predictions[1].argmax(axis=1).squeeze()
@@ -135,6 +135,10 @@ def main(cfg: DictConfig):
                 dataframe.to_csv(os.path.join(log_dir,'checkpoints',fold,"predictions.csv"), index=False)
 
             else : 
+
+                json.dump(id2label, open(os.path.join(log_dir,'checkpoints',fold,"id2label.json"), 'w'))
+                json.dump(label2id, open(os.path.join(log_dir,'checkpoints',fold,"label2id.json"), 'w'))
+
                 
                 dataframe = pd.DataFrame( columns = ["preds_family", "labels_family"]) 
             
