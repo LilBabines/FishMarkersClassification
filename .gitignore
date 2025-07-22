@@ -188,3 +188,4 @@ checkpoint-*/
 tax_out/
 ncbi-taxdump/
 taxo/
+scripts/DNAGPT/checkpoints

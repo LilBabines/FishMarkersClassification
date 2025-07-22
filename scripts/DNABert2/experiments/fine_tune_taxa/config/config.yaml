@@ -1,9 +1,9 @@
 hydra:
   run:
-    dir: experiments/fine_tune_taxa/outputs/teleo_from_pt_dnabert2
+    dir: experiments/fine_tune_taxa/outputs/mifish_from_pt_dnabert2
 
 data:
-  dataset_path: "experiments/fine_tune_taxa/data/teleov2_no_cefe_full_random/folds"
+  dataset_path: "experiments/fine_tune_taxa/data/mifish/folds"
 
 task:
   train : True  # False if just want to load model and evaluate, true to train before it
