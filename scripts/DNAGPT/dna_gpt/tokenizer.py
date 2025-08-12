@@ -8,6 +8,9 @@ from typing import Optional, Union
 
 import numpy as np
 import torch
+from torch.utils.data import DataLoader, Dataset
+import pytorch_lightning as pl
+import pandas as pd
 
 
 class KmerTokenizer:
@@ -93,3 +96,106 @@ class KmerTokenizer:
 
         seq = "".join([self.id_to_piece(tid) for tid in token_ids])
         return seq
+
+    def __call__(self,
+             text,
+             padding=False,
+             truncation=False,
+             max_length=None,
+             return_tensors=None,
+             **kwargs):
+        if isinstance(text, str):
+            texts = [text]
+        else:
+            texts = text  # batch mode
+    
+        encodings = []
+        for t in texts:
+            tokens = self.encode(
+                t,
+                max_len=max_length if truncation else -1,
+                pad=padding,
+                to_tensor=False
+            )
+            encodings.append(tokens)
+    
+        # Padding à la main si batch et padding demandé
+        if padding:
+            max_len = max(len(seq) for seq in encodings)
+            encodings = [
+                seq + [self.pad_id] * (max_len - len(seq)) for seq in encodings
+            ]
+    
+        result = {
+            "input_ids": torch.tensor(encodings, dtype=torch.long)
+        }
+    
+        if padding:
+            attention_masks = [
+                [1 if token != self.pad_id else 0 for token in seq]
+                for seq in encodings
+            ]
+            result["attention_mask"] = torch.tensor(attention_masks, dtype=torch.long)
+    
+        if return_tensors == "pt":
+            return result
+        return {k: v.tolist() for k, v in result.items()}
+
+
+
+class DNADataset(Dataset):
+    def __init__(self, df, tokenizer, label2id, pad= False, max_len=256):
+        self.sequences = df['sequence'].tolist()
+        self.labels = df['family'].map(label2id).tolist()
+        self.tokenizer = tokenizer
+        self.max_len = max_len
+        self.pad = pad
+
+    def __len__(self):
+        return len(self.sequences)
+
+    def __getitem__(self, idx):
+        seq = self.sequences[idx]
+        label = self.labels[idx]
+        ids = self.tokenizer.encode(seq, pad=self.pad, max_len=self.max_len)
+        return ids, label
+        
+
+class DNALightningDataModule(pl.LightningDataModule):
+    def __init__(self, marker, fold, label2id, batch_size=32, num_workers=3, max_len=256):
+        super().__init__()
+        self.marker = marker
+        self.fold = fold
+        # Use same tokenizer spec as training
+        special_tokens = (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+                  + ["+", '-', '*', '/', '=', "&", "|", "!"]
+                  + ['M', 'B'] + ['P']
+                  + ['R', 'I', 'K', 'L', 'O', 'Q', 'S', 'U', 'V']
+                  + ['W', 'Y', 'X', 'Z'])
+        self.tokenizer = KmerTokenizer(k=6, reserved_tokens=special_tokens, dynamic_kmer=True)
+        self.label2id = label2id
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.max_len = max_len
+
+        self.train_csv = f"data/{marker}/folds/fold_{fold}/train_low_augment.csv"
+        self.val_csv = f"data/{marker}/folds/fold_{fold}/val.csv"
+        self.test_csv = f"data/{marker}/folds/fold_{fold}/test.csv"
+
+    def setup(self, stage=None):
+        self.df_train = pd.read_csv(self.train_csv)
+        self.df_val = pd.read_csv(self.val_csv)
+        self.df_test = pd.read_csv(self.test_csv)
+
+        self.train_dataset = DNADataset(self.df_train, self.tokenizer, self.label2id, pad=True, max_len=self.max_len)
+        self.val_dataset = DNADataset(self.df_val, self.tokenizer, self.label2id, pad=True, max_len=self.max_len)
+        self.test_dataset = DNADataset(self.df_test, self.tokenizer, self.label2id, pad=True, max_len=self.max_len)
+
+    def train_dataloader(self):
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
+
+    def val_dataloader(self):
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
+
+    def test_dataloader(self):
+        return DataLoader(self.test_dataset, batch_size=1, shuffle=False, num_workers=self.num_workers)

@@ -3,4 +3,4 @@
 # Author: chenchenqin
 # Data: 2022/10/9 17:22
 from .gpt import GPT
-from .dna_gpt import DNAGPT
+from .dna_gpt import DNAGPT_LT

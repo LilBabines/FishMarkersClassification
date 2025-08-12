@@ -38,6 +38,19 @@ def load_data(path="Data/TeleoSplitGenera_300_medium/"):
         test = None
     return train, test, val
 
+def load_csv(path):
+    '''Load the dataset from the path
+    Args:
+        path (str): The path to the dataset
+    Returns:
+        data (pd.DataFrame): The dataset
+    '''
+    if os.path.exists(path):
+        data = pd.read_csv(path)
+        return data
+    else:
+        raise FileNotFoundError(f"The file {path} does not exist.")
+
 class AugmentedDataset(Dataset):
     def __init__(self, sequences, labels, tokenizer,transform=mutation):
         self.sequences = sequences
@@ -58,9 +71,9 @@ class AugmentedDataset(Dataset):
         item['labels'] = label
         return item
     
-def encode_self_supervised_dataset(tokenizer, dir_path):
+def encode_self_supervised_dataset(tokenizer, csv_path):
     # train, val, test = load_data(dir_path)
-    data = load_data(dir_path)
+    data = load_csv(csv_path)
     val = data.sample(frac=0.05, random_state=42)
     train = data.drop(val.index)
 

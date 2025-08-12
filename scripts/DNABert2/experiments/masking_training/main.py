@@ -27,7 +27,7 @@ def set_seed(seed):
 set_seed(42)
 
 
-@hydra.main(version_base="1.3",config_path="config", config_name="config_berry")
+@hydra.main(version_base="1.3",config_path="config", config_name="config_teleo")
 def main(cfg: DictConfig):
     
     log_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
@@ -95,7 +95,7 @@ def main(cfg: DictConfig):
     else:
         tokenizer = load_tokenizer(cfg.model.tokenizer_name)
 
-        train_dataset, val_dataset= encode_self_supervised_dataset(tokenizer,dir_path=cfg.data.dataset_path)
+        train_dataset, val_dataset= encode_self_supervised_dataset(tokenizer,csv_path=cfg.data.dataset_path)
         model = bert_layers.BertForMaskedLM.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
         model.resize_token_embeddings(len(tokenizer))
         

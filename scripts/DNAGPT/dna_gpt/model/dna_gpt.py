@@ -3,9 +3,14 @@
 # Author: chenchenqin
 # Data: 2022/12/14 19:15
 import torch
+from torch import Tensor
 import torch.nn as nn
-
+import pytorch_lightning as pl
+from transformers import get_cosine_schedule_with_warmup
 from .gpt import GPT, LayerNorm
+from torchmetrics.classification import MulticlassAccuracy, MulticlassF1Score
+from torch.optim import AdamW
+from sklearn.metrics import precision_recall_fscore_support as prf
 
 
 class DNAGPT(GPT):
@@ -24,7 +29,8 @@ class DNAGPT(GPT):
                  num_layers=3,
                  num_heads=3,
                  embedding_dim=48,
-                 bias=True
+                 bias=True,
+                 num_classes=None
                  ):
         super().__init__(vocab_size,
                          max_len,
@@ -51,28 +57,22 @@ class DNAGPT(GPT):
             LayerNorm(self.embedding_dim, bias=bias),
             nn.Linear(self.embedding_dim, 1, bias=bias)
         )
+        
+        self.num_classes = num_classes
+
+        if self.num_classes is not None:
+            self.classification_head = nn.Sequential(
+                nn.Linear(self.embedding_dim, self.embedding_dim, bias=bias),
+                nn.SiLU(inplace=True),
+                LayerNorm(self.embedding_dim, bias=bias),
+                nn.Linear(self.embedding_dim, num_classes, bias=bias)
+            )
 
     def _embedding_impl(self,
-                        tokens,
-                        numbers=None,
-                        number_block=None):
+                        tokens):
         bs, _ = tokens.size()
         token_emb = self.transformer.wte(tokens)
-        if numbers is not None and number_block is not None:
-            numbers = numbers.to(token_emb.dtype)
-            num_emb = self.number_embedding(numbers.unsqueeze(-1))
-            output_tokens = []
-            for j in range(bs):
-                split_token = torch.split(token_emb[j], number_block[j].tolist(), dim=0)
-                num_splits = len(split_token)
-                stored_tokens = split_token[0]
-                for i in range(num_splits - 1):
-                    stored_tokens = torch.cat((stored_tokens, num_emb.unsqueeze(0)[j], split_token[i + 1]), dim=0)
-
-                output_tokens.append(stored_tokens)
-
-            token_emb = torch.stack(output_tokens, dim=0)
-
+        
         seq_len = token_emb.shape[1]
         pos = torch.arange(0, seq_len,
                            dtype=torch.long,
@@ -88,54 +88,168 @@ class DNAGPT(GPT):
 
         return self.transformer.ln_f(x)
 
-    def _head_impl(self, hiddens, number_loc=None):
+    def _head_impl(self, hiddens):
         mlm = self.mlm_head(hiddens)
-        if number_loc is None:
-            return mlm
+       
+        return mlm
 
-        bs, seq_len = hiddens.shape[:2]
-        total_num = []
-        for i in range(bs):
-            bs_num = []
-            for j in range(number_loc.shape[1]):
-                bs_num.append(hiddens[i, number_loc[i, j]])
-            bs_num = torch.stack(bs_num, dim=0)
-            total_num.append(bs_num)
-        total_num = torch.stack(total_num, dim=0)  # [bs, ]
-        num = self.num_regression(total_num)
-        return num, mlm
 
-    def forward(self,
-                token_ids,
-                numbers=None,
-                number_loc=None,
-                number_block=None):
-        x = self._embedding_impl(token_ids, numbers, number_block)
+    def forward(self, token_ids, mode="mlm"):
+        x = self._embedding_impl(token_ids)
         x = self._transformer_impl(x)
-        return self._head_impl(x, number_loc)
+
+        if self.num_classes is not None and mode == "classification":
+            pooled = x[:, -1, :]  # ou x.mean(dim=1) si plus adapté
+            return self.classification_head(pooled)  # [B, num_classes]
+
+        return self._head_impl(x)  # [B, T, vocab_size]
 
     @classmethod
-    def from_name(cls, name, vocab_size):
+    def from_name(cls, name, vocab_size,num_classes):
         model_cfgs = {
             'dna_gpt0.1b_h': dict(vocab_size=vocab_size,
                                   max_len=4096,
                                   num_layers=12,
                                   num_heads=12,
                                   embedding_dim=768,
-                                  bias=False),
+                                  bias=False,
+                                  num_classes=num_classes),
             'dna_gpt0.1b_m': dict(vocab_size=vocab_size,
                                   max_len=512,
                                   num_layers=12,
                                   num_heads=12,
                                   embedding_dim=768,
-                                  bias=False),
+                                  bias=False,
+                                  num_classes=num_classes),
             'dna_gpt3b_m': dict(vocab_size=vocab_size,
                                 max_len=512,
                                 num_layers=60,
                                 num_heads=64,
                                 embedding_dim=2048,
-                                bias=False)
+                                bias=False,
+                                num_classes=num_classes)
         }
         assert name in model_cfgs, f"unkown model name, only suport: {list(model_cfgs.keys())}"
         cfg = model_cfgs[name]
         return cls(**cfg)
+
+
+class DNAGPT_LT(pl.LightningModule):
+    
+    def __init__(self, total_steps, warmup_steps, vocab_size,num_classes ):
+        
+        super().__init__()
+        
+        self.model = DNAGPT.from_name('dna_gpt0.1b_m', vocab_size=vocab_size,num_classes=num_classes)
+        self.criterion = torch.nn.CrossEntropyLoss()
+        self.lr = 3e-5
+        self.weight_decay = 1e-1
+        self.total_steps = total_steps
+        self.warmup_steps = warmup_steps
+        
+        # Metrics
+        self.train_acc = MulticlassAccuracy(num_classes=num_classes, average='macro')
+        self.val_acc = MulticlassAccuracy(num_classes=num_classes, average='macro')
+        self.test_acc = MulticlassAccuracy(num_classes=num_classes, average='macro')
+
+        self.train_f1 = MulticlassF1Score(num_classes=num_classes, average='macro')
+        self.val_f1 = MulticlassF1Score(num_classes=num_classes, average='macro')
+        self.test_f1 = MulticlassF1Score(num_classes=num_classes, average='macro')
+
+        self.test_preds = []
+        self.test_labels = []
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self.model(x, mode="classification")
+
+    def training_step(self, batch: tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
+
+        x, y = batch
+        logits = self.forward(x)
+        loss = self.criterion(logits, y)
+    
+        preds = torch.argmax(logits, dim=1)
+        self.train_acc.update(preds, y)
+        self.train_f1.update(preds, y)
+    
+        self.log("train_loss", loss, prog_bar=False)
+
+        # Log du learning rate
+        lr = self.lr_schedulers().get_last_lr()[0]
+        self.log("lr", lr, prog_bar=False, on_step=True, on_epoch=False)
+        
+        return loss
+    
+    def on_training_epoch_end(self):
+        self.log("train_macro_acc", self.train_acc.compute(), prog_bar=False)
+        self.log("train_macro_f1", self.train_f1.compute(), prog_bar=False)
+        self.train_acc.reset()
+        self.train_f1.reset()
+
+        return loss
+    
+    def validation_step(self, batch: tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
+        
+        x, y = batch
+        logits = self.forward(x)
+        loss = self.criterion(logits, y)
+        preds = torch.argmax(logits, dim=1)
+    
+        self.val_acc.update(preds, y)
+        self.val_f1.update(preds, y)
+    
+        self.log("val_loss", loss, prog_bar=False)
+        return loss
+    
+    def on_validation_epoch_end(self):
+        self.log("val_macro_acc", self.val_acc.compute(), prog_bar=False)
+        self.log("val_macro_f1", self.val_f1.compute(), prog_bar=False)
+        self.val_acc.reset()
+        self.val_f1.reset()
+    
+    def test_step(self, batch: tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
+        x, y = batch
+        logits = self.forward(x)
+        preds = torch.argmax(logits, dim=1)
+        loss = self.criterion(logits, y)
+    
+        self.test_acc.update(preds, y)
+        self.test_f1.update(preds, y)
+
+        self.test_preds.append(preds.cpu())
+        self.test_labels.append(y.cpu())
+    
+        return loss
+    
+    def on_test_epoch_end(self):
+        
+        self.log("test_macro_acc", self.test_acc.compute())
+        self.log("test_macro_f1", self.test_f1.compute())
+        self.test_acc.reset()
+        self.test_f1.reset()
+
+        p,r,f,s = prf(self.test_labels,self.test_preds,average='macro',zero_division=0)
+        
+        self.log("test_sklearn_precision", p)
+        self.log("test_sklearn_recall", r)
+        self.log("test_sklearn_f1", f)
+
+        self.test_preds.clear()
+        self.test_labels.clear()
+
+
+    def configure_optimizers(self):
+        optimizer = AdamW(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+        scheduler = get_cosine_schedule_with_warmup(
+            optimizer,
+            num_warmup_steps=self.warmup_steps,
+            num_training_steps=self.total_steps
+        )
+        return {
+            'optimizer': optimizer,
+            'lr_scheduler': {
+                'scheduler': scheduler,
+                'interval': 'step',
+                'frequency': 1
+            }
+        }

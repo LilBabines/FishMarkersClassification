@@ -1,23 +1,15 @@
 hydra:
   run:
-    dir: experiments/fine_tune_taxa/outputs/teleo_from_mlm_no_augment
+    dir: outputs/fine_tune_taxa/teleo_from_pt_dnabert2
 
 data:
-  dataset_path: "experiments/fine_tune_taxa/data/teleov2_no_cefe_full_random/folds"
-
-task:
-  train : True  # False if just want to load model and evaluate, true to train before it
-  checkpoint_path : experiments/masking_training/outputs/masking_teleo/checkpoints
-  save_preds : True
-  task: "multiTaxa" # multiTaxa or singleTaxa
-  
-  # taxa_classes : ["order", "family"]
+  dataset_path: "data"
 
 trainer:
   kwargs :
 
     learning_rate: 2e-5
-    per_device_train_batch_size : 16
+    per_device_train_batch_size : 32
     per_device_eval_batch_size : 16
     weight_decay: 0.001
     warmup_ratio: 0.1
@@ -39,17 +31,6 @@ trainer:
 
   early_stopping_patience : 30
   
-
-model:
-  model_name: "zhihan1996/DNABERT-2-117M"
-  tokenizer_name: "zhihan1996/DNABERT-2-117M"  # can train "bpe" or an int for k-mer
-  local : True  # set to True to load the model with model_name from local path
-  local_path :  experiments/masking_training/outputs/masking_teleo/checkpoints
-  bert_kwargs :
-    hidden_size: 768
-    max_position_embeddings: 512
-
-
 loss :
   loss : "cross_entropy"
 

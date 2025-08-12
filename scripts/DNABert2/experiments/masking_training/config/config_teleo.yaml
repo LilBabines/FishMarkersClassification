@@ -3,7 +3,7 @@ hydra:
     dir: experiments/masking_training/outputs/masking_teleo
 data:
   kfold : False
-  dataset_path: "experiments/masking_training/data_clean/teleo_fold.csv"
+  dataset_path: "experiments/masking_training/data/data_clean/teleo_fold.csv"
 
 task:
   train : True  # False if just want to load model and evaluate, true to train before it
@@ -48,11 +48,10 @@ model:
   model_name: "zhihan1996/DNABERT-2-117M"
   tokenizer_name: "zhihan1996/DNABERT-2-117M"  # can train "bpe" or an int for k-mer
   local : False  # set to True to load the model with model_name from local path
-  mlm_probability : 0.20
+  mlm_probability : 0.25
   bert_kwargs :
     hidden_size: 768
-    max_position_embeddings: 514
-    ignore_mismatched_sizes: True
+    max_position_embeddings: 512
 
 # loss :
   #loss : "cross_entropy" # cross_entropy  ##### or BCEWithLogitsLoss not yet implemented

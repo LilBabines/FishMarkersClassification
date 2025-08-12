@@ -185,7 +185,9 @@ RESULTS/BERTAX
 taxdump/
 fish.obidms/
 checkpoint-*/
+*.ckpt
+*.pth
 tax_out/
 ncbi-taxdump/
 taxo/
-scripts/DNAGPT/checkpoints
+scripts/DNAGPT/data
