@@ -20,7 +20,6 @@ color() {
 }
 color info 94m 
 
-## Read config file
 marker="Ac16"
 data_nfold=6
 input_dir="data/${marker}/folds/"
