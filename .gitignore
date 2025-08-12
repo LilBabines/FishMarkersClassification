@@ -187,6 +187,8 @@ fish.obidms/
 checkpoint-*/
 *.ckpt
 *.pth
+*.h5
+
 tax_out/
 ncbi-taxdump/
 taxo/
