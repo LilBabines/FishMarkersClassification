@@ -10,7 +10,7 @@ from transformers import get_cosine_schedule_with_warmup
 from .gpt import GPT, LayerNorm
 from torchmetrics.classification import MulticlassAccuracy, MulticlassF1Score
 from torch.optim import AdamW
-from sklearn.metrics import precision_recall_fscore_support as prf
+
 
 
 class DNAGPT(GPT):
@@ -186,7 +186,6 @@ class DNAGPT_LT(pl.LightningModule):
         self.train_acc.reset()
         self.train_f1.reset()
 
-        return loss
     
     def validation_step(self, batch: tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         
@@ -228,14 +227,31 @@ class DNAGPT_LT(pl.LightningModule):
         self.test_acc.reset()
         self.test_f1.reset()
 
-        p,r,f,s = prf(self.test_labels,self.test_preds,average='macro',zero_division=0)
+        # p,r,f,s = prf(self.test_labels,self.test_preds,average='macro',zero_division=0)
         
-        self.log("test_sklearn_precision", p)
-        self.log("test_sklearn_recall", r)
-        self.log("test_sklearn_f1", f)
+        # self.log("test_sklearn_precision", p)
+        # self.log("test_sklearn_recall", r)
+        # self.log("test_sklearn_f1", f)
 
         self.test_preds.clear()
         self.test_labels.clear()
+
+    def predict_step(self, batch, batch_idx: int):
+        if isinstance(batch, (list, tuple)) and len(batch) >= 1:
+            x = batch[0]
+        else:
+            x = batch  # si ton predict_dataloader retourne juste X
+
+        logits = self.forward(x)                    # [B, num_classes]
+        probs = torch.softmax(logits, dim=1)        # proba par classe
+        preds = torch.argmax(probs, dim=1)          # label prédit
+
+        out = {"probs": probs}
+
+
+
+        return out
+
 
 
     def configure_optimizers(self):

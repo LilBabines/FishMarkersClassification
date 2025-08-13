@@ -156,7 +156,7 @@ if __name__ == '__main__':
     else:
         seq_len_like = None
 
-    data_set = ["berry","Ac16"]
+    data_set = ["berry","ac16",'mifish','teleo']
 
     for data_name in data_set:
 
@@ -181,6 +181,9 @@ if __name__ == '__main__':
         #label to index mapping
         family_to_index = {family: i for i, family in enumerate(unique_family)}
         order_to_index = {order: i for i, order in enumerate(unique_order)}
+
+        # json.dump(family_to_index, open(os.path.join("data",data_name, "family_to_index.json"), 'w'))
+        # json.dump(order_to_index, open(os.path.join("data",data_name, "order_to_index.json"), 'w'))
 
         
         
@@ -207,10 +210,11 @@ if __name__ == '__main__':
                         tf.one_hot([family_to_index[family] for family in test_y_family], len(unique_family))))
             
             if test:
-                from models.bert_utils import load_bert
-                best = "berry/fold_3/model.best.acc.h5"
-                model = load_bert(best, compile_=True)
-                max_length = model.input_shape[0][1]
+                pass
+                # from models.bert_utils import load_bert
+                # best = "berry/fold_3/model.best.acc.h5"
+                # model = load_bert(best, compile_=True)
+                # max_length = model.input_shape[0][1]
             else:
                 # building model
                 if args.multi_tax:

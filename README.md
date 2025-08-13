@@ -1,10 +1,10 @@
-# Fish DNA Barcoding Benchmark
+# Fish Marker Family Assignment Benchmark
 
-We propose a benchmark to compare existing methods for assigning taxonomic information to DNA teleo markers at the family rank. Currently, there is a significant lack of exhaustive genetic reference databases for fish species and genera, with approximately 30% to 70% of species lacking genetic data <span style="color:red"> PAPER ? </span>. To address this limitation, we systematically removed around 10% of genera from the reference database to evaluate model performance under conditions that mimic real-world data constraints.
+This repository contains the code and data used for the benchmark study on fish marker family assignment, as described in the paper "Benchmarking Deep Learning Methods for Fish Marker Family Assignment".
 
 ## Data
 
-For this study, we utilized the [MIDORI2 Reference](https://www.reference-midori.info/download.php) and [MitoFish](https://mitofish.aori.u-tokyo.ac.jp/) databases. Teleo marker extraction was performed using the [CRABS tool](https://doi.org/10.1111/1755-0998.13741) via Docker execution (details provided in [data/README.md](data/README.md))
+For this study, we utilized the [MIDORI2 Reference](https://www.reference-midori.info/download.php) and [MitoFish](https://mitofish.aori.u-tokyo.ac.jp/) databases. Teleo, Mifish, Berry and Ac16 markers extraction was performed using the [CRABS tool](https://doi.org/10.1111/1755-0998.13741) via Docker execution (details provided in [data/README.md](data/README.md))
 
 
 ## Deep Classification
