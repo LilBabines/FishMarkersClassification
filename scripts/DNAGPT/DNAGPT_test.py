@@ -12,7 +12,6 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import CSVLogger
 from pytorch_lightning.callbacks import EarlyStopping
-from sklearn.metrics import precision_recall_fscore_support as prf
 
 
 import torch
@@ -26,7 +25,7 @@ from sklearn.metrics import f1_score
 
 markers = ["Ac16","berry","mifish","teleov2_no_cefe_full_random"]
 
-
+totaux = {}
 for marker in markers:
     print("MARKER : ",marker)
 
@@ -125,24 +124,35 @@ for marker in markers:
         
         # Test (en chargeant le meilleur modèle)
         trainer.test(DNA_module, datamodule=datamodule, ckpt_path=f"results_pl/{marker}/fold_{fold}/best_checkpoint.ckpt")
+        
+        # save csv
 
-        # prediction 
-        logits_predictions = trainer.predict(DNA_module, dataloaders=datamodule.test_dataloader(), ckpt_path=f"results_pl/{marker}/fold_{fold}/best_checkpoint.ckpt")
+        idx_preds = DNA_module.final_test_preds
+        idx_labels = DNA_module.final_test_labels
 
-        all_probs = torch.cat([o["probs"] for o in logits_predictions]).cpu()
-        all_preds = torch.argmax(all_probs, axis=1).numpy()
+        preds_str = [id2label[int(p)] for p in idx_preds]
+        labels_str = [id2label[int(l)] for l in idx_labels]
 
-        label_preds = [id2label[pred] for pred in all_preds]
+        test_csv = f"data/{marker}/folds/fold_{fold+1}/test.csv"
 
-        test_pd = datamodule.df_test
+        df_test = pd.read_csv(test_csv)
+        
 
-        test_pd['predicted_family'] = label_preds
+        df = pd.DataFrame({
+        "label": labels_str,
+        "DNAGPT": preds_str
+        })
 
-        p, r, f, s = prf(test_pd['family'], test_pd['predicted_family'], average='macro', zero_division=0)
+        assert df_test['family'].equals(pd.Series(labels_str))
+        
+        totaux[(marker,fold)]= df.copy()
+        
+dataframe_totaux = pd.concat(totaux, names=["marker", "fold"])
+dataframe_totaux = dataframe_totaux.rename_axis(index={dataframe_totaux.index.names[2]: "sample_id"})
 
+dataframe_totaux.to_csv('results_dnagpt.csv')
 
-
-        test_pd.to_csv(f"results_pl/{marker}/fold_{fold}/predictions.csv", index=False)
+        
         
 
 

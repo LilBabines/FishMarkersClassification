@@ -10,7 +10,7 @@ from transformers import get_cosine_schedule_with_warmup
 from .gpt import GPT, LayerNorm
 from torchmetrics.classification import MulticlassAccuracy, MulticlassF1Score
 from torch.optim import AdamW
-
+from sklearn.metrics import precision_recall_fscore_support as prf
 
 
 class DNAGPT(GPT):
@@ -156,9 +156,6 @@ class DNAGPT_LT(pl.LightningModule):
         self.val_f1 = MulticlassF1Score(num_classes=num_classes, average='macro')
         self.test_f1 = MulticlassF1Score(num_classes=num_classes, average='macro')
 
-        self.test_preds = []
-        self.test_labels = []
-
     def forward(self, x: Tensor) -> Tensor:
         return self.model(x, mode="classification")
 
@@ -186,6 +183,7 @@ class DNAGPT_LT(pl.LightningModule):
         self.train_acc.reset()
         self.train_f1.reset()
 
+        return loss
     
     def validation_step(self, batch: tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         
@@ -205,7 +203,11 @@ class DNAGPT_LT(pl.LightningModule):
         self.log("val_macro_f1", self.val_f1.compute(), prog_bar=False)
         self.val_acc.reset()
         self.val_f1.reset()
-    
+
+    def on_test_epoch_start(self):
+        self.test_preds = []
+        self.test_labels = []
+        
     def test_step(self, batch: tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         x, y = batch
         logits = self.forward(x)
@@ -220,6 +222,7 @@ class DNAGPT_LT(pl.LightningModule):
     
         return loss
     
+    
     def on_test_epoch_end(self):
         
         self.log("test_macro_acc", self.test_acc.compute())
@@ -227,31 +230,19 @@ class DNAGPT_LT(pl.LightningModule):
         self.test_acc.reset()
         self.test_f1.reset()
 
-        # p,r,f,s = prf(self.test_labels,self.test_preds,average='macro',zero_division=0)
+        p,r,f,s = prf(self.test_labels,self.test_preds,average='macro',zero_division=0)
         
-        # self.log("test_sklearn_precision", p)
-        # self.log("test_sklearn_recall", r)
-        # self.log("test_sklearn_f1", f)
+        self.log("test_sklearn_precision", p)
+        self.log("test_sklearn_recall", r)
+        self.log("test_sklearn_f1", f)
 
+        # Stockage pour consultation après test
+
+        self.final_test_preds = torch.cat(self.test_preds).numpy()
+        self.final_test_labels = torch.cat(self.test_labels).numpy()
+        
         self.test_preds.clear()
         self.test_labels.clear()
-
-    def predict_step(self, batch, batch_idx: int):
-        if isinstance(batch, (list, tuple)) and len(batch) >= 1:
-            x = batch[0]
-        else:
-            x = batch  # si ton predict_dataloader retourne juste X
-
-        logits = self.forward(x)                    # [B, num_classes]
-        probs = torch.softmax(logits, dim=1)        # proba par classe
-        preds = torch.argmax(probs, dim=1)          # label prédit
-
-        out = {"probs": probs}
-
-
-
-        return out
-
 
 
     def configure_optimizers(self):
