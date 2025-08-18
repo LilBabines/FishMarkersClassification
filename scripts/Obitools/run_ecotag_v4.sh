@@ -24,8 +24,7 @@ marker="Ac16"
 data_nfold=6
 input_dir="data/${marker}/folds/"
 
-#_main
-## Download taxdump files and import in OBITools3 format
+
 if [ ! -f taxo/names.dmp ]; then
   printf $info "::Info:: Download taxdump files \n"
   mkdir -p taxo

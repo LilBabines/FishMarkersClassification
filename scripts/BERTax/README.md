@@ -1,6 +1,6 @@
 # BERTAX
 
-This repository provides an adaptation of [rnajena/bertax_training](https://github.com/rnajena/bertax_training) to fit the specific data and taxonomy constraints of this study.
+This directory provides an adaptation of [rnajena/bertax_training](https://github.com/rnajena/bertax_training) to fit the specific data and taxonomy constraints of this study.
 
 ## Python Virtual Environment Setup
 
@@ -25,3 +25,4 @@ python -m models.bert_nc_finetune path_to_pt_bertax/pre_trained.h5 \
     --store_train_data \
     --multi_tax \
     --store_predictions
+```
