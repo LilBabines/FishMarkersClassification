@@ -1,8 +1,8 @@
-# DATA pre-process
+# Data Pre-processing
 
-Download, marker extraction,  cleanning and prepare data can be done by executing `download_markerExtraction_cleaning_prepare_data.sh`.
-
-We can also download resulting data from ####TODO###.
+Data download, marker extraction, cleaning, and preparation can be performed by executing the script `download_markerExtraction_cleaning_prepare_data.sh`.  
+Please note that the resulting dataset may differ from the one originally used in the study due to database updates, as well as some taxonomy cleaning that was manually supervised.  
+For reproducibility, we recommend downloading the prepared dataset directly from [link to be added].
 
 ## Data Used
 

@@ -101,8 +101,6 @@ def main(cfg: DictConfig):
             except KeyboardInterrupt:
                 print("Training interrupted, current status will be saved")
                 trainer.save_model()
-                
-            plot_save_loss(os.path.join(log_dir,'checkpoints',fold), metrics = metrics_order +metrics_family)
         
         print("Testing")
             
