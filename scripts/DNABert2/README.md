@@ -1,24 +1,24 @@
 # Deep Teleo DNA Classification
 
-## Setup (tested on Ubuntu24.04)
 
-**0.** Should set-up CUDA for pytorch training efficency.
+## Python Virtual Environment Setup
 
-**1.** Create python *venv* `python3.13 -m venv dnabert2_venv`
+The code was tested with **Python 3.13.6**.  
+To create and activate the environment:
 
+1. `python3.13 -m venv dnabert2_venv`
+2. `source dnabert2_venv/bin/activate`  
+3. `pip install -r requirements.txt`  
+4. `pip uninstall triton` (due to version incompatibility with DNABERT2)
 
-**2.** Install package depedency `pip install -r requirements.txt`
-**3** Uninstall triton `pip uninstall triton` due to DNABERT2 version inconsistency
+## Execution
 
+To pretrained DNABERT2 on token masking task, run :
+```bash
+python experiments/masking_training/main.py
+```
+To finetune DNABERT2 on this study’s dataset (4 markers and 6 folds), run:
 
-
-
-## Usage 
-
-### Reproduicing paper results :
-1. Prepare data :
-
-2. Launch [experiments/BouillaBert/main.py](experiments/BouillaBert/main.py), it will fine_tune DNABERT-2 model than infer on test_set.
-
-
-
+```bash
+python experiments/fine_tune_taxa/main.py
+```

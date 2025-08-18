@@ -16,6 +16,10 @@ All methods were tested on a Linux operating system. For use on other platforms,
 - [DNABERT2](scripts/DNABert2/README.md), [code](https://github.com/MAGICS-LAB/DNABERT_2)/[paper](https://arxiv.org/abs/2306.15006)
 - [DNAGPT](scripts/DNAGPT/README.md), [code](https://github.com/TencentAILabHealthcare/DNAGPT)/[paper](https://www.biorxiv.org/content/10.1101/2023.07.11.548628v2.full.pdf)
 
+## Evaluation
+
+`python metrics.py `##TODO
+
 ## Team 
 
 **Lab :** MARBEC X CEFE - Montpellier France 
