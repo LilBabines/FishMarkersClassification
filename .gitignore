@@ -165,7 +165,6 @@ outputs/
 outputs/training
 outputs/main
 outputs/TeleoSplitGenera_300_medium
-data/*/
 resources/*/
 mlm_pre_training/
 scripts/BERTeleo/resources/
@@ -193,3 +192,6 @@ tax_out/
 ncbi-taxdump/
 taxo/
 scripts/DNAGPT/data
+
+!data/markers/**/
+!data/markers/**/*.csv
