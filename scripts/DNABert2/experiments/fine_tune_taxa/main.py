@@ -53,7 +53,7 @@ def main(cfg: DictConfig):
             train_dataset, val_dataset, test_dataset, id2label_order, label2id_order, id2label_family, label2id_family = encode_multiTaxa_dataset(tokenizer, os.path.join(cfg.data.dataset_path,fold))
             num_classes = (len(id2label_order) , len(id2label_family))
 
-            model = MultiTaxaClassification( len(id2label_order), len(id2label_family),vocab_size = tokenizer.vocab_size,model_name=cfg.model.model_name ,**cfg.model.bert_kwargs)  
+            model = MultiTaxaClassification( len(id2label_order), len(id2label_family),vocab_size = tokenizer.vocab_size,model_name=cfg.model.model_name, use_pretrained = cfg.model.use_pretrained ,**cfg.model.bert_kwargs)  
 
         elif cfg.task.task == "singleTaxa":
 
