@@ -180,6 +180,8 @@ RESULTS/BERTAX
 *log/
 *.fasta
 *.ecotag
+*.dmp
+data/database/*.txt
 
 taxdump/
 fish.obidms/
@@ -187,6 +189,7 @@ checkpoint-*/
 *.ckpt
 *.pth
 *.h5
+*.accession2taxid
 
 tax_out/
 ncbi-taxdump/
