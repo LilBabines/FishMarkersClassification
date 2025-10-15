@@ -2,7 +2,7 @@
 
 Data download, marker extraction, cleaning, and preparation can be performed by executing the script `download_markerExtraction_cleaning_prepare_data.sh`.  
 Please note that the resulting dataset may differ from the one originally used in the study due to database updates, as well as some taxonomy cleaning that was manually supervised.  
-For reproducibility, we recommend downloading the prepared dataset directly from [link to be added].
+For reproducibility, we recommend to use [markers](markers/).
 
 ## Data Used
 
@@ -19,7 +19,7 @@ For reproducibility, we recommend downloading the prepared dataset directly from
 
 ## Cleaning & Preparing Data via Python
 
-Processing steps from the two remaining `output_pga_3.tsv` ([pre_process.py functions](pre_process.py) ) :
+Processing steps from the two remaining `output_mitofish_pcr.tsv` and ``output_midori_pcr.tsv``([pre_process.py functions](pre_process.py) ) :
 1. `pre_process(mitophish, ncbi)`, clean raw data by fill Nan values, keep only fish, remove short ( less than 20 ) or uncertain (contains nucleotide `N`) sequences
 2. `fold_6_data(data_path, n_splits=6)`, build a 6 fold partition, stratified at genus level (genus in val or test are not in train)
 3. `def get_repartition(data_path)`, check fold repartition

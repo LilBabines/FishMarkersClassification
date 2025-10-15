@@ -71,7 +71,7 @@ def fill_correction(df):
         return df
 
 def rename_columns(df):
-    df.rename(columns={0:'ID_ncbi', 1:'taxid_ncbi', 2:'kingdom', 3:'phylum', 4:'class', 5:'order', 6:'family', 7:'genus', 8:'species', 9:'sequence'}, inplace=True)
+    df.rename(columns={0:'ID', 1:'taxid_ncbi', 2:'kingdom', 3:'phylum', 4:'class', 5:'order', 6:'family', 7:'genus', 8:'species', 9:'sequence'}, inplace=True)
     return df
 
 def remove_not_desired(df_nan):
@@ -367,6 +367,56 @@ def info_dataframe(df):
 
 
     print(f'nombre d"espèce : {len(df["species"].value_counts())}')
+
+def pre_process_vert01(path_mitofish, path_genbank):
+    '''
+    Pre-process the data extracted from MitoFish and NCBI
+        :param mitophish: path to the data extracted from MitoFish with CRABS ( separated by `tab`, without header)
+        :param ncbi: path to the data extracted from NCBI with CRABS ( separated by `tab`, without header)
+    '''
+    # load vert_01 from ncbi 12S
+    vert_01_ncbi= pd.read_csv(path_genbank, sep='\t',header=None)
+    vert_01_ncbi = rename_columns(vert_01_ncbi)
+
+    # load vert_01 from FishBase 12S
+    vert_01_fb = pd.read_csv(path_mitofish, sep='\t',header=None)
+    vert_01_fb = rename_columns(vert_01_fb)
+
+    # Concatenate the two dataframes
+    all_vert_01 = pd.concat([vert_01_ncbi, vert_01_fb])
+   
+    # Fill Nan
+    df_nan = all_vert_01[all_vert_01['class'].isna()]
+    df_no_nan = all_vert_01[~all_vert_01['class'].isna()]
+    cleaned_vert_01 = pd.concat([remove_not_desired(df_nan), df_no_nan])
+
+    # Filter sequence lenght
+    cleaned_vert_01_correct_len = cleaned_vert_01[cleaned_vert_01['sequence'].str.len() >= 25]
+
+    # Filter sequience contains N
+    cleaned_vert_01_no_N = cleaned_vert_01_correct_len[cleaned_vert_01_correct_len['sequence'].str.contains('N') == False]
+
+    # Fill NaN
+    vert_01 = fill_correction(cleaned_vert_01_no_N)
+
+    # Keep only Actinopteri and Chondrichthyes
+    vert_01 = vert_01[(vert_01['class'] == 'Actinopteri') | (vert_01['class'] == 'Chondrichthyes')]
+    
+    print("Clean taxo consistency")
+    vert_01 = clean_taxo_consistency(vert_01, verif=True)
+
+    print("Clean taxid incompability")
+    vert_01 = clean_taxid_incompability(vert_01)
+
+    print("Verif taxid incompability")
+    verif_taxid_incompability(vert_01)
+
+
+    vert_01 = final_process(vert_01)
+
+    vert_01.to_csv("data_clean/vert01_clean.tsv", sep='\t', index=False)
+
+    return vert_01
 
 def pre_process_mifish(path_mitofish, path_genbank):
     '''
