@@ -20,9 +20,9 @@ Follow the author’s instructions here: [BERTAX installation guide](https://git
 To finetune BERTAX on this study’s dataset (4 markers and 6 folds), run:
 
 ```bash
-python -m models.bert_nc_finetune path_to_pt_bertax/pre_trained.h5 \
-    --use_defined_train_test_set \
-    --store_train_data \
-    --multi_tax \
-    --store_predictions
+    python -m models.bert_nc_finetune.py checkpoints/pre_trained.h5                
+                                        --use_defined_train_test_set 
+                                        --store_train_data 
+                                        --multi_tax 
+                                        --store_predictions
 ```

@@ -71,7 +71,7 @@ def fill_correction(df):
         return df
 
 def rename_columns(df):
-    df.rename(columns={0:'ID_ncbi', 1:'taxid_ncbi', 2:'kingdom', 3:'phylum', 4:'class', 5:'order', 6:'family', 7:'genus', 8:'species', 9:'sequence'}, inplace=True)
+    df.rename(columns={0:'ID', 1:'taxid_ncbi', 2:'kingdom', 3:'phylum', 4:'class', 5:'order', 6:'family', 7:'genus', 8:'species', 9:'sequence'}, inplace=True)
     return df
 
 def remove_not_desired(df_nan):
@@ -368,17 +368,17 @@ def info_dataframe(df):
 
     print(f'nombre d"espèce : {len(df["species"].value_counts())}')
 
+
 def pre_process_mifish(path_mitofish, path_genbank):
     '''
     Pre-process the data extracted from MitoFish and NCBI
         :param mitophish: path to the data extracted from MitoFish with CRABS ( separated by `tab`, without header)
         :param ncbi: path to the data extracted from NCBI with CRABS ( separated by `tab`, without header)
     '''
-    # load vert_01 from ncbi 12S
+
     mifish_genbank= pd.read_csv(path_genbank, sep='\t',header=None)
     mifish_genbank = rename_columns(mifish_genbank)
 
-    # load vert_01 from FishBase 12S
     mifish_mitofish = pd.read_csv(path_mitofish, sep='\t',header=None)
     mifish_mitofish = rename_columns(mifish_mitofish)
 
@@ -413,7 +413,7 @@ def pre_process_mifish(path_mitofish, path_genbank):
 
 def pre_process_berry(path_genbank):
    
-    # load vert_01 from ncbi 12S
+
     berry_genbank= pd.read_csv(path_genbank, sep='\t',header=None)
     berry_genbank = rename_columns(berry_genbank)
 
@@ -453,11 +453,11 @@ def pre_process_teleo(path_mitofish, path_genbank):
         :param ncbi: path to the data extracted from NCBI with CRABS ( separated by `tab`, without header)
     '''
     print(" Read data")
-    # load vert_01 from ncbi 12S
+
     teleo_genbank= pd.read_csv(path_genbank, sep='\t',header=None)
     teleo_genbank = rename_columns(teleo_genbank)
 
-    # load vert_01 from FishBase 12S
+
     teleo_mitofish = pd.read_csv(path_mitofish, sep='\t',header=None)
     teleo_mitofish = rename_columns(teleo_mitofish)
 
@@ -567,10 +567,7 @@ def fold_6_data(df,out_put):
     return df
 
 def get_repartition(df):
-    '''
-    Get the repartition of the data in each fold
-        :param data_path: path to the pre-processed data with fold (vert_01_clean_fold.tsv, separated by `tab`)
-    '''
+
     repartition = {}
 
     for i in range(6):

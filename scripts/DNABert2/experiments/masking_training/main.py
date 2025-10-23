@@ -27,7 +27,7 @@ def set_seed(seed):
 set_seed(42)
 
 
-@hydra.main(version_base="1.3",config_path="config", config_name="config_teleo")
+@hydra.main(version_base="1.3",config_path="config", config_name="config")
 def main(cfg: DictConfig):
     
     log_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir

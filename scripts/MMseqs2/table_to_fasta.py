@@ -55,11 +55,12 @@ def test_csv_to_fasta(csv,fasta):
             f.write(f'>{index}_test_{row["family"]}\n{row["sequence"]}\n')
     return csv
 
-for fold in folds:
-    train = pd.read_csv(f'Ac16/folds/{fold}/train.csv')
-    train['tax_id'] = train['family'].apply(get_ncbi_id_from_taxon_name)
-    csv = csv_to_fasta(train, f'Ac16/folds/{fold}/train.fasta')
-    csv_uniq_tax = csv[['unique_header', 'tax_id']]
-    csv_uniq_tax.to_csv(f'Ac16/folds/{fold}/train_tax.tsv',sep=' ', index=False)
-    test = pd.read_csv(f'Ac16/folds/{fold}/test.csv')
-    test_csv_to_fasta(test, f'Ac16/folds/{fold}/test.fasta')
+for markers in ["Ac16","berry","teleo","MiFish"]:
+    for fold in folds:
+        train = pd.read_csv(f'{markers}/folds/{fold}/train.csv')
+        train['tax_id'] = train['family'].apply(get_ncbi_id_from_taxon_name)
+        csv = csv_to_fasta(train, f'{markers}/folds/{fold}/train.fasta')
+        csv_uniq_tax = csv[['unique_header', 'tax_id']]
+        csv_uniq_tax.to_csv(f'{markers}/folds/{fold}/train_tax.tsv',sep=' ', index=False)
+        test = pd.read_csv(f'{markers}/folds/{fold}/test.csv')
+        test_csv_to_fasta(test, f'{markers}/folds/{fold}/test.fasta')
