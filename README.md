@@ -13,7 +13,7 @@ All methods were tested on a Linux operating system. For use on other platforms,
 - [OBITOOLS 4](scripts/Obitools/README.md)  ( [code](https://github.com/metabarcoding/obitools4))
 - [MMSEQS2](scripts/MMseqs2/README.md) ([code](https://github.com/soedinglab/MMseqs2)/[paper](https://www.nature.com/articles/nbt.3988))
 - [BERTAX](scripts/BERTax/README.md)  ([code](https://github.com/rnajena/bertax)/[paper](https://doi.org/10.1073/pnas.2122636119))
-- [DNABERT2](scripts/DNABert2/README.md) ([code](https://github.com/MAGICS-LAB/DNABERT_2)/[paper](https://arxiv.org/abs/2306.15006))
+- [BouillaBert](scripts/BouillaBert/README.md) ([code](https://github.com/MAGICS-LAB/DNABERT_2)/[paper](https://arxiv.org/abs/2306.15006))
 - [DNAGPT](scripts/DNAGPT/README.md) ([code](https://github.com/TencentAILabHealthcare/DNAGPT)/[paper](https://www.biorxiv.org/content/10.1101/2023.07.11.548628v2.full.pdf)
 )
 
