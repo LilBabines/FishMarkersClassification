@@ -4,6 +4,7 @@ hydra:
 
 data:
   dataset_path: "experiments/fine_tune_taxa/data/berry/folds"
+  train_name: "train_low_augment.csv"
 
 task:
   train : True  # False if just want to load model and evaluate, true to train before it
@@ -43,9 +44,9 @@ trainer:
 model:
   model_name: "zhihan1996/DNABERT-2-117M"
   tokenizer_name: "zhihan1996/DNABERT-2-117M"  # can train "bpe" or an int for k-mer
-  local : False  # set to True to load the model with model_name from local path
+  local : True  # set to True to load the model with model_name from local path
   local_path :  experiments/masking_training/outputs/masking_berry/checkpoints
-  use_pretrained : False
+  use_pretrained : True
   bert_kwargs :
     hidden_size: 768
     max_position_embeddings: 512

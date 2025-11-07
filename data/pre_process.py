@@ -647,7 +647,7 @@ def split_and_mutate_sequence(sequence):
     # Return the mutated sequence
     return mutated_sequence
 
-def mutate(df, full_random = True):
+def mutate(df, full_random = True, full_random_proba=0.05):
     # Calculate the value count of the "family" column
     family_counts = df['family'].value_counts()
 
@@ -666,7 +666,7 @@ def mutate(df, full_random = True):
         
         # Apply mutations to each duplicated row's sequence
         if full_random:
-            duplicated_rows['sequence'] = duplicated_rows['sequence'].apply(lambda seq: mutate_dna_sequence(seq, 0.05))
+            duplicated_rows['sequence'] = duplicated_rows['sequence'].apply(lambda seq: mutate_dna_sequence(seq, full_random_proba))
         else:
             duplicated_rows['sequence'] = duplicated_rows['sequence'].apply(lambda seq: split_and_mutate_sequence(seq))
         
@@ -684,6 +684,15 @@ def mutate_data_fold(data_path):
     '''
     
     for fold in range(1, 7):
-        df = pd.read_csv(data_path +f"/fold_{fold}/train.csv")
-        df = mutate(df)
-        df.to_csv(data_path +f"/fold_{fold}/train_low_augment.csv", index=False)
+        df_pure = pd.read_csv(data_path +f"/fold_{fold}/train.csv")
+        for full_random_proba in [0.02, 0.1, 0.15] :
+            df_copy = df_pure.copy()
+            df = mutate(df_copy, full_random_proba=full_random_proba)
+            df.to_csv(data_path +f"/fold_{fold}/train_augment_{full_random_proba}.csv", index=False)
+        # df = mutate(df, full_random_proba=0.05)
+        # df.to_csv(data_path +f"/fold_{fold}/train_low_augment.csv", index=False)
+
+
+if __name__ == "__main__":
+    for marker in ["mifish","teleo","berry","ac16"]:
+        mutate_data_fold(f"/home/auguste/Desktop/eDNA/TeleoClassification/scripts/BouillaBert/experiments/fine_tune_taxa/data/{marker}/folds")

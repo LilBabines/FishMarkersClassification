@@ -21,7 +21,7 @@ def mutation(seq, mutation_ratio_min=LOW_NUC, mutation_ration_max=HIGHT_NUC, mut
 
 
 
-def load_data(path="Data/TeleoSplitGenera_300_medium/"):
+def load_data(path="Data/TeleoSplitGenera_300_medium/", train_name=None):
     '''Load the dataset from the path/train.csv, path/test.csv, and path/val.csv
     Args:
         path (str): The path to the dataset
@@ -30,7 +30,9 @@ def load_data(path="Data/TeleoSplitGenera_300_medium/"):
         test (pd.DataFrame): The testing dataset
         val (pd.DataFrame): The validation dataset
     '''
-    train = pd.read_csv(os.path.join(path , "train_low_augment.csv"))
+
+    print("Load, Train name : ", train_name)
+    train = pd.read_csv(os.path.join(path , train_name if train_name else "train.csv"))
     val = pd.read_csv(os.path.join(path ,  "val.csv"))
     if 'test.csv' in os.listdir(path):
         test = pd.read_csv(os.path.join(path ,  "test.csv"))
@@ -95,7 +97,7 @@ def encode_self_supervised_dataset(tokenizer, csv_path):
     return train_dataset, val_dataset, 
 
 
-def encode_multiTaxa_dataset(tokenizer, dir_path, dynamic_augmentation=False):
+def encode_multiTaxa_dataset(tokenizer, dir_path, train_name=None, dynamic_augmentation=False):
     '''Encode the data using the tokenizer for multi-label classification and return Datasets train/val/test.
     Args:
         tokenizer (PreTrainedTokenizerFast): The tokenizer
@@ -111,7 +113,7 @@ def encode_multiTaxa_dataset(tokenizer, dir_path, dynamic_augmentation=False):
         id2label_family (dict): The id to family label mapping
         label2id_family (dict): The family label to id mapping
     '''
-    train, test, val = load_data(dir_path)
+    train, test, val = load_data(dir_path, train_name=train_name)
     # Tokenize the sequences
     train_encodings = tokenizer(train['sequence'].tolist(), truncation=True, max_length=512)
     val_encodings = tokenizer(val['sequence'].tolist(), truncation=True, max_length=512)
