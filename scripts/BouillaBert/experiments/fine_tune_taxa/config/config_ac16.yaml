@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: experiments/fine_tune_taxa/outputs/ac16_from_random_weights
+    dir: experiments/fine_tune_taxa/outputs/ac16_from_mlm
 
 data:
   dataset_path: "experiments/fine_tune_taxa/data/ac16/folds"

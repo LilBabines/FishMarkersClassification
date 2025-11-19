@@ -1,1 +1,0 @@
-python -m models.bert_nc_finetune checkpoints/pre_trained.h5  --use_defined_train_test_set --store_train_data --multi_tax --store_predictions

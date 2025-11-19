@@ -7,6 +7,11 @@ This directory provides an adaptation of [TencentAILabHealthcare/DNAGPT](https:/
 ### Download pre-trained weights
 
 * [dna_gpt0.1b_m.pth](https://drive.google.com/file/d/1C0BRXfz7RNtCSjSY1dKQeR1yP7I3wTyx/view?usp=drive_link): DNAGPT 0.1B params model pretrained with mutli-organism genomes
+* move it to `scripts/DNAGPT/checkpoints`
+
+### Copy data
+
+`cp -R data/markers scripts/DNAGPT/data`
 
 ## Python Virtual Environment Setup
 
@@ -18,22 +23,10 @@ We can reuse it or create a new one with the same steps.
 To finetune DNAGPT on this study’s dataset (4 markers and 6 folds), run:
 
 ```bash
+source scripts/BouillaBert/.venv/bin/activate
+pip install pytorch-lightning
+cd scripts/DNAGPT
 python main.py
-```
-
-### Citation
-
-**DNAGPT**
-
-```
-@article{zhang2023dnagpt,
-  title={DNAGPT: A Generalized Pretrained Tool for Multiple DNA Sequence Analysis Tasks},
-  author={Zhang, Daoan and Zhang, Weitong and He, Bing and Zhang, Jianguo and Qin, Chenchen and Yao, Jianhua},
-  journal={bioRxiv},
-  pages={2023--07},
-  year={2023},
-  publisher={Cold Spring Harbor Laboratory}
-}
 ```
 
 

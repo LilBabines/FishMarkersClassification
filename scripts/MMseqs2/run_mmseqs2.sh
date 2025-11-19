@@ -11,7 +11,7 @@ color info 94m
 # Markers to iterate over
 markers=(mifish teleo ac16 berry)
 
-input_dir="markers/mifish/folds/"
+input_dir="data/mifish/folds/"
 output_dir="result/mifish/folds/"
 
 # Download NCBI taxdump once
@@ -28,10 +28,10 @@ fi
 
 
 for marker in "${markers[@]}"; do
-    input_dir="markers/${marker}/folds/"
+    input_dir="data/${marker}/folds/"
     output_dir="result/${marker}/folds/"
 
-    for fold in $(eval echo {1..$fold_count}); do
+    for fold in $(eval echo {1..6}); do
         printf $info "::Info:: [${marker}] Start taxonomic classification for fold ${fold} ...\n"
 
         start=$(date +%s)

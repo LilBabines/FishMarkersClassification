@@ -1,8 +1,6 @@
 from ete3 import NCBITaxa
 ncbi = NCBITaxa()
 
-import os 
-print(os.getcwd())
 
 import pandas as pd
 import numpy as np
@@ -14,7 +12,7 @@ folds = [f'fold_{i}' for i in range(1, 7)]
 
 def get_ncbi_id_from_taxon_name(taxon_name):
     if taxon_name=="Cepolidae":
-        taxon_name = "Cepolidae (in: bony fishes)"
+        taxon_name = "Cepolidae (in: ray-finned fishes)"
 
     return ncbi.get_name_translator([taxon_name])[taxon_name][0]
 
@@ -55,12 +53,12 @@ def test_csv_to_fasta(csv,fasta):
             f.write(f'>{index}_test_{row["family"]}\n{row["sequence"]}\n')
     return csv
 
-for markers in ["Ac16","berry","teleo","MiFish"]:
+for markers in ["ac16","berry","teleo","mifish"]:
     for fold in folds:
-        train = pd.read_csv(f'{markers}/folds/{fold}/train.csv')
+        train = pd.read_csv(f'data/{markers}/folds/{fold}/train.csv')
         train['tax_id'] = train['family'].apply(get_ncbi_id_from_taxon_name)
-        csv = csv_to_fasta(train, f'{markers}/folds/{fold}/train.fasta')
+        csv = csv_to_fasta(train, f'data/{markers}/folds/{fold}/train.fasta')
         csv_uniq_tax = csv[['unique_header', 'tax_id']]
-        csv_uniq_tax.to_csv(f'{markers}/folds/{fold}/train_tax.tsv',sep=' ', index=False)
-        test = pd.read_csv(f'{markers}/folds/{fold}/test.csv')
-        test_csv_to_fasta(test, f'{markers}/folds/{fold}/test.fasta')
+        csv_uniq_tax.to_csv(f'data/{markers}/folds/{fold}/train_tax.tsv',sep=' ', index=False)
+        test = pd.read_csv(f'data/{markers}/folds/{fold}/test.csv')
+        test_csv_to_fasta(test, f'data/{markers}/folds/{fold}/test.fasta')

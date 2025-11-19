@@ -190,11 +190,13 @@ checkpoint-*/
 *.pth
 *.h5
 *.accession2taxid
+*predictions.pkl
 
 tax_out/
 ncbi-taxdump/
 taxo/
 scripts/DNAGPT/data
+bertax_venv/
 
 !data/markers/**/
 !data/markers/**/*.csv

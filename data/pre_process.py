@@ -1,5 +1,3 @@
-# After CRABS extraction on mitofish and NCBI, error treshold is set to 3
-
 import pandas as pd
 import numpy as np
 import sklearn

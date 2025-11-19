@@ -21,6 +21,28 @@ from os.path import splitext
 import pandas as pd
 from sklearn.metrics import balanced_accuracy_score
 
+
+
+import json
+
+_old_dumps = json.dumps
+
+def safe_dumps(obj, *args, **kwargs):
+    def default(o):
+        # fonctoin du string for gelu import erreur
+        if callable(o):
+            return getattr(o, "__name__", str(o))
+        # else err
+        raise TypeError(f"Object of type {o.__class__.__name__} "
+                        "is not JSON serializable")
+
+    kwargs.setdefault("default", default)
+    return _old_dumps(obj, *args, **kwargs)
+
+json.dumps = safe_dumps
+
+
+
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 mirrored_strategy = tf.distribute.MirroredStrategy()
 

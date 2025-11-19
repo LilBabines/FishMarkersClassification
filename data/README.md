@@ -1,8 +1,8 @@
 # Data Pre-processing
 
-Data download, marker extraction, cleaning, and preparation can be performed by executing `crabs_script.sh` and `pre_process.py`.  
+Data download, marker extraction, cleaning, and preparation can be performed by using `crabs_script.sh` and `pre_process.py`.  
 Please note that the resulting dataset may differ from the one originally used in the study due to database updates, as well as some taxonomy cleaning that was manually supervised.  
-For reproducibility, we recommend to directly use [data](data/).
+For reproducibility, we recommend to directly use preprocessed data at [markers/](markers/).
 
 ## Data Used
 
@@ -11,7 +11,7 @@ For reproducibility, we recommend to directly use [data](data/).
 
 ## Download & Marker Extraction via CRABS
 
-* [CRABS](https://doi.org/10.1111/1755-0998.13741) v.1.7.7.0 / DOCKER IMAGE ID : 9fd9821ce055. CRABS instalation [github](https://github.com/gjeunen/reference_database_creator?tab=readme-ov-file#installing-crabs), command used :
+* [CRABS](https://doi.org/10.1111/1755-0998.13741) v.1.7.7.0 / DOCKER IMAGE ID : 9fd9821ce055. CRABS instalation [github](https://github.com/gjeunen/reference_database_creator?tab=readme-ov-file#41-manual-installation), command used :
     * `crabs --download-taxonomy`
     * `crabs --import`
     * `crabs --download-midori ` , `crabs --download-mitofish`
