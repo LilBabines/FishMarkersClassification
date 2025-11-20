@@ -8,8 +8,6 @@
 # Args:
 #   - config: yaml config file
 # Requirements: OBITools3
-# Author:  Morgane BRUNO
-# Email: morgane.bruno@cefe.cnrs.fr
 # Licence MIT
 ################################################
 

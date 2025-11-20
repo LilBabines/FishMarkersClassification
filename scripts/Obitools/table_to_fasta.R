@@ -1,8 +1,6 @@
 #
 # Script Name: table_to_fasta.R
 # Purpose of script: Convert table into fasta
-# Author: Morgane Bruno
-# Contact: morgane.bruno@cefe.cnrs.fr
 # Licence: MIT
 # Usage: Rscript table_to_fasta.R [options]
 #

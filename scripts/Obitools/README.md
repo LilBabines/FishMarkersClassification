@@ -21,7 +21,3 @@ This script will:
 2. Convert CSV files to FASTA format using [table_to_fasta.R](table_to_fasta.R).
 3. Build the database and perform queries on the trainset and testset.
 4. Run ecotag to assign taxonomy to the testset.
-
-# Acknowledge
-
-Morgane Bruno - CEFE, morgane.bruno@cefe.cnrs.fr : [code](https://gitlab.mbb.univ-montp2.fr/bev/benchmark_taxonomic_classification/-/tree/master)

@@ -96,7 +96,6 @@ class MultiTaxaClassification(nn.Module):
 
 def load_bert_model(name, vocab_size, local=False, id2label=None, label2id=None):
 
-    # model_path_save=r"C:\Users\Auguste Verdier\Desktop\ADNe\BouillaClip\Model\genera_300_medium_3_mer\checkpoint-85335"
     if local:
         assert os.path.exists(name), "The model path does not exist at the specified location, but local flag is set to True"
         assert os.path.exists(os.path.join(name,"config.json")), "The model path does not contain a config.json file"

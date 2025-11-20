@@ -689,8 +689,3 @@ def mutate_data_fold(data_path):
             df.to_csv(data_path +f"/fold_{fold}/train_augment_{full_random_proba}.csv", index=False)
         # df = mutate(df, full_random_proba=0.05)
         # df.to_csv(data_path +f"/fold_{fold}/train_low_augment.csv", index=False)
-
-
-if __name__ == "__main__":
-    for marker in ["mifish","teleo","berry","ac16"]:
-        mutate_data_fold(f"/home/auguste/Desktop/eDNA/TeleoClassification/scripts/BouillaBert/experiments/fine_tune_taxa/data/{marker}/folds")
