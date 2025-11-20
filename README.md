@@ -1,6 +1,6 @@
 # Fish Marker Family Assignment Benchmark
 
-This repository contains the code and data used for the benchmark study on fish marker family assignment, as described in the paper "Benchmarking Deep Learning Methods for Fish Marker Family Assignment".
+This repository contains the code and data used for the benchmark study on fish marker family assignment, as described in the paper "Transductive learning from a transformer foundation model improves the taxonomic classification of eDNA metabarcodes".
 
 ## Data
 
