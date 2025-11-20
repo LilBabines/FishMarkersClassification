@@ -200,3 +200,4 @@ bertax_venv/
 
 !data/markers/**/
 !data/markers/**/*.csv
+!results/all_predictions_pre_compute.csv
