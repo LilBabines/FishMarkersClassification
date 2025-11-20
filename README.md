@@ -20,15 +20,3 @@ All methods were tested on a Linux operating system. For use on other platforms,
 ## Results
 
 To enable figure reproduction, the prediction [CSV file ](results/all_predictions_pre_compute.csv) is provided along with the corresponding scripts [script](results/figure_scripts.py).
-
-## Team 
-
-**Lab :** MARBEC X CEFE - Montpellier France 
-
-**Project :** Fish Predict 
-
-**Author :** 
-
-- Simon Bettinger - sbettinger33@gmail.com
-- Morgane Bruno - morgane.bruno@cefe.cnrs.fr
-- Auguste Verdier - auguste.verdier@umontpellier.fr
